@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Quickshell.Wayland
+import './Theme.qml'
 
 ShellRoot {
     Variants {
@@ -55,7 +56,8 @@ ShellRoot {
                     font.family: "poppins"
                     font.weight: 600
                     font.letterSpacing: -7
-                    color: '#e0ffffff'
+                    // color: '#000000'
+                    color: Theme.accentColor
                     transformOrigin: Item.Center
                     renderType: Text.NativeRendering
                     smooth: true
@@ -68,7 +70,7 @@ ShellRoot {
                     font.family: "poppins"
                     font.weight: 500
                     font.letterSpacing: -1
-                    color: '#e0ffffff'
+                    color: Theme.accentColor
                     transformOrigin: Item.Center
                     renderType: Text.NativeRendering
                     smooth: true
