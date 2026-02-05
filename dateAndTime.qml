@@ -27,7 +27,7 @@ ShellRoot {
 
             ColumnLayout {
                 id: content
-                spacing: -30
+                spacing: -20
                 // x: Math.floor(Math.random() * (Math.floor(max)- Math.ceil(min) + 1)) + Math.ceil(min);
                 x: Math.floor(Math.random() * (Math.floor(1580)- Math.ceil(50) + 1)) + Math.ceil(50);
                 y: Math.floor(Math.random() * (Math.floor(850)- Math.ceil(50) + 1)) + Math.ceil(50);
@@ -53,9 +53,10 @@ ShellRoot {
                     id: clocktime
                     text: Qt.formatDateTime(clock.date, "hh:mm ")
                     font.pixelSize: 120
-                    font.family: "poppins"
-                    font.weight: 600
+                    font.family: "zalando sans expanded"
+                    font.weight: 990
                     font.letterSpacing: -7
+                    font.italic: true
                     // color: '#000000'
                     color: Theme.accentColor
                     transformOrigin: Item.Center
@@ -66,8 +67,8 @@ ShellRoot {
                     id: clockdate
                     // text: Qt.formatDateTime(clock.date, "  ddd, dd/MM")
                     text: Qt.formatDateTime(clock.date, "  ddd, MMM dd")
-                    font.pixelSize: 28
-                    font.family: "poppins"
+                    font.pixelSize: 30
+                    font.family: "zalando sans expanded"
                     font.weight: 500
                     font.letterSpacing: -1
                     color: Theme.accentColor
