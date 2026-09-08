@@ -1,4 +1,4 @@
-import Quickshell 
+import Quickshell
 import QtQuick
 import QtQuick.Controls.Material
 import Quickshell.Wayland
@@ -11,8 +11,8 @@ Variants {
 		focusable: false
 		visible: true
 		color: "transparent"
-		implicitHeight:1080
-		implicitWidth: 1920
+		implicitHeight: Screen.height
+		implicitWidth: Screen.width
 		aboveWindows: true
 		Material.theme: Material.Dark
 		WlrLayershell.layer: WlrLayer.Top

@@ -1,4 +1,4 @@
-import Quickshell 
+import Quickshell
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Material
@@ -15,8 +15,8 @@ ShellRoot {
             focusable: false
             visible: true
             color: "transparent"
-            implicitHeight:1080
-            implicitWidth: 1920
+            implicitHeight: Screen.height
+            implicitWidth: Screen.width
             aboveWindows: false
             Material.theme: Material.Dark
             WlrLayershell.layer: WlrLayer.Bottom
@@ -47,7 +47,7 @@ ShellRoot {
                 SystemClock {
                     id: clock
                     precision: SystemClock.Seconds
-                    
+
                 }
                 Text {
                     id: clocktime
