@@ -15,8 +15,8 @@ ShellRoot {
             focusable: false
             visible: true
             color: "transparent"
-            implicitHeight: Screen.height
-            implicitWidth: Screen.width
+            implicitHeight: screen.height
+            implicitWidth: screen.width
             aboveWindows: false
             Material.theme: Material.Dark
             WlrLayershell.layer: WlrLayer.Bottom

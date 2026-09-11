@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls.Material
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -25,7 +24,7 @@ Variants {
             visible: true
             color: "transparent"
             implicitHeight: 32
-            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.layer: WlrLayer.Bottom
 
             property string cpuPercent: "0%"
             property string ramPercent: "0%"
