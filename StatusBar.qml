@@ -13,17 +13,21 @@ Variants {
             id: statusBar
 
             required property var modelData
+            required property bool isVisible
+            isVisible: true
+
             screen: modelData
 
-            anchors {
-                left: true
-                top: true
-                right: true
-            }
+            // anchors {
+            //     left: true
+            //     top: true
+            //     right: true
+            // }
 
             visible: true
             color: "transparent"
-            implicitHeight: 32
+            implicitHeight: screen.height / 6
+            implicitWidth: screen.width / 3
             WlrLayershell.layer: WlrLayer.Bottom
 
             property string cpuPercent: "0%"
@@ -53,6 +57,29 @@ Variants {
                 }
             }
 
+            property string networkSpeed: "0 B/s ↓↑ 0 B/s"
+
+            Process {
+                id: netMonProcess
+                command: ["/home/devmed/qt-custom-shell/scripts/networkSpeed.sh"]
+                stdout: SplitParser {
+                            splitMarker: "\n"
+                            onRead: (data) => {
+                                if (!data || data.trim() === "") return;
+                                try {
+                                    // 2. Parse the individual JSON line
+                                    let json = JSON.parse(data.trim());
+                                    // 3. Extract the "text" key and update the QML property
+                                    if (json && json.text !== undefined) {
+                                        statusBar.networkSpeed = json.text;
+                                    }
+                                } catch (e) {
+                                    console.error("Failed to parse network speed JSON:", e);
+                                }
+                            }
+                        }
+            }
+
             // --- Niri Workspaces Fetcher ---
             Process {
                 id: niriWorkspacesProcess
@@ -69,7 +96,6 @@ Variants {
 
             Process {
                 id: keyboardLayoutProcess
-                // command: ["sh", "-c", "layout=$(niri msg keyboard-layouts | grep '*' | grep -o '(\\(\\S*\\))'); if [ \"$layout\" = \"(Colemak-DH)\" ]; then echo \"(CDH)\"; else echo \"$layout\"; fi"]
                 command: ["/home/devmed/.config/waybar/scripts/check-current-keyboard-layout-niri.sh"]
                 stdout: SplitParser {
                     onRead: data => statusBar.activekeyboardLayout = data.trim()
@@ -103,6 +129,7 @@ Variants {
                     keyboardLayoutProcess.running = true;
                     mediaProcess.running = true;
                     activeWinProcess.running = true;
+                    netMonProcess.running = true;
                 }
             }
 
@@ -125,165 +152,155 @@ Variants {
             readonly property color colSuccess: "#30d158"
 
             Rectangle {
+                id: rekt
                 anchors.fill: parent
-                color: colBarBg
+                color: statusBar.colBarBg
+                // color: "transparent"
+                radius: 17.5
 
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 1
-                    color: colBarBorder
-                }
+                // Bottom border
+                // Rectangle {
+                //     anchors.left: parent.left
+                //     anchors.right: parent.right
+                //     anchors.bottom: parent.bottom
+                //     height: 1
+                //     color: colBarBorder
+                // }
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 8
-                    anchors.rightMargin: 8
+                ColumnLayout {
+                    anchors.fill: rekt
+                    anchors.topMargin: 2
+                    anchors.bottomMargin: 0
+                    anchors.leftMargin: 4
+                    anchors.rightMargin: 4
                     spacing: 6
 
                     // ==========================================
                     // MODULES LEFT
                     // ==========================================
-                    Row {
+                    RowLayout {
                         spacing: 6
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
-                        // --- Niri Workspaces Module ---
                         Row {
-                            spacing: 4
-                            anchors.verticalCenter: parent.verticalCenter
+                            // Uptime Module
+                            Rectangle {
+                                id: uptimePill
+                                implicitWidth: uptimeHoverArea.containsMouse ? uptimeText.implicitWidth + 18 : 28
+                                height: 24
+                                radius: 12
+                                color: uptimeHoverArea.containsMouse ? statusBar.colHoverBg : "transparent"
+                                border.color: statusBar.colAccentMuted
+                                border.width: 1
 
-                            Repeater {
-                                model: statusBar.workspacesList
+                                Behavior on implicitWidth {
+                                    NumberAnimation {
+                                        duration: 150
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                }
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 150
+                                    }
+                                }
 
-                                delegate: Rectangle {
-                                    required property var modelData
-                                    width: modelData.is_focused ? 24 : 16
-                                    height: 16
-                                    radius: 8
-                                    color: modelData.is_focused ? statusBar.colAccent : statusBar.colAccentMuted
+                                Text {
+                                    id: uptimeText
+                                    anchors.centerIn: parent
+                                    text: uptimeHoverArea.containsMouse ? "↑ " + statusBar.sysUptime : "↑"
+                                    font.family: "JetBrainsMonoNL Nerd Font"
+                                    font.pixelSize: 12
+                                    color: statusBar.colAccent
+                                }
 
-                                    Behavior on width {
-                                        NumberAnimation {
-                                            duration: 150
+                                MouseArea {
+                                    id: uptimeHoverArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                }
+                            }
+                        }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                        Row {
+                            // System Stats Pill
+                            Rectangle {
+                                implicitWidth: pillRow.implicitWidth + 16
+                                height: 24
+                                radius: 12
+                                color: sysPillMouse.containsMouse ? statusBar.colHoverBg : "transparent"
+                                border.color: statusBar.colAccentMuted
+                                border.width: 1
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 150
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: sysPillMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                }
+
+                                Row {
+                                    id: pillRow
+                                    anchors.centerIn: parent
+                                    spacing: 10
+
+                                    Text {
+                                        text: "  " + statusBar.cpuPercent
+                                        font.family: "JetBrainsMonoNL Nerd Font"
+                                        font.pixelSize: 12
+                                        color: statusBar.colAccent
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: statusBar.exec(["alacritty", "--class=Btop", "-e", "btop"])
                                         }
                                     }
 
                                     Text {
-                                        anchors.centerIn: parent
-                                        text: modelData.idx
+                                        text: "|"
+                                        color: statusBar.colAccentMuted
                                         font.pixelSize: 10
-                                        color: modelData.is_focused ? "#000000" : statusBar.colTextMain
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: statusBar.exec(["niri", "msg", "action", "focus-workspace", modelData.idx.toString()])
+                                    Text {
+                                        text: "  " + statusBar.ramPercent
+                                        font.family: "JetBrainsMonoNL Nerd Font"
+                                        font.pixelSize: 12
+                                        color: statusBar.colAccent
                                     }
-                                }
-                            }
-                        }
 
-                        // Uptime Module
-                        Rectangle {
-                            id: uptimePill
-                            implicitWidth: uptimeHoverArea.containsMouse ? uptimeText.implicitWidth + 18 : 28
-                            height: 24
-                            radius: 12
-                            color: uptimeHoverArea.containsMouse ? statusBar.colHoverBg : "transparent"
-                            border.color: statusBar.colAccentMuted
-                            border.width: 1
-
-                            Behavior on implicitWidth {
-                                NumberAnimation {
-                                    duration: 150
-                                    easing.type: Easing.InOutQuad
-                                }
-                            }
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
-
-                            Text {
-                                id: uptimeText
-                                anchors.centerIn: parent
-                                text: uptimeHoverArea.containsMouse ? "↑ " + statusBar.sysUptime : "↑"
-                                font.family: "JetBrainsMonoNL Nerd Font"
-                                font.pixelSize: 12
-                                color: statusBar.colAccent
-                            }
-
-                            MouseArea {
-                                id: uptimeHoverArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                            }
-                        }
-
-                        // System Stats Pill
-                        Rectangle {
-                            implicitWidth: pillRow.implicitWidth + 16
-                            height: 24
-                            radius: 12
-                            color: sysPillMouse.containsMouse ? statusBar.colHoverBg : "transparent"
-                            border.color: statusBar.colAccentMuted
-                            border.width: 1
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 150
-                                }
-                            }
-
-                            MouseArea {
-                                id: sysPillMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                            }
-
-                            Row {
-                                id: pillRow
-                                anchors.centerIn: parent
-                                spacing: 10
-
-                                Text {
-                                    text: "  " + statusBar.cpuPercent
-                                    font.family: "JetBrainsMonoNL Nerd Font"
-                                    font.pixelSize: 12
-                                    color: statusBar.colAccent
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: statusBar.exec(["alacritty", "--class=Btop", "-e", "btop"])
+                                    Text {
+                                        text: "|"
+                                        color: statusBar.colAccentMuted
+                                        font.pixelSize: 10
                                     }
-                                }
 
-                                Text {
-                                    text: "|"
-                                    color: statusBar.colAccentMuted
-                                    font.pixelSize: 10
-                                }
+                                    Text {
+                                        text: "⇄  " + statusBar.swapPercent
+                                        font.family: "JetBrainsMonoNL Nerd Font"
+                                        font.pixelSize: 12
+                                        color: statusBar.colAccent
+                                    }
 
-                                Text {
-                                    text: "  " + statusBar.ramPercent
-                                    font.family: "JetBrainsMonoNL Nerd Font"
-                                    font.pixelSize: 12
-                                    color: statusBar.colAccent
-                                }
+                                    Text {
+                                        text: "|"
+                                        color: statusBar.colAccentMuted
+                                        font.pixelSize: 10
+                                    }
 
-                                Text {
-                                    text: "|"
-                                    color: statusBar.colAccentMuted
-                                    font.pixelSize: 10
-                                }
+                                    Text {
+                                        text: statusBar.networkSpeed
+                                        font.family: "JetBrainsMonoNL Nerd Font"
+                                        font.pixelSize: 12
+                                        color: statusBar.colAccent
+                                    }
 
-                                Text {
-                                    text: "⇄  " + statusBar.swapPercent
-                                    font.family: "JetBrainsMonoNL Nerd Font"
-                                    font.pixelSize: 12
-                                    color: statusBar.colAccent
                                 }
                             }
                         }
@@ -297,14 +314,8 @@ Variants {
                     // MODULES CENTER
                     // ==========================================
                     Row {
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                         spacing: 6
-
-                        BarModule {
-                            text: statusBar.activeWinTitle
-                            textColor: statusBar.colTextMain
-                            implicitWidth: Math.min(moduleText.implicitWidth + 18, 250)
-                        }
 
                         BarModule {
                             id: clockModule
@@ -337,7 +348,6 @@ Variants {
                             text: "[ " + statusBar.activekeyboardLayout + " ]"
                             textColor: statusBar.colTextMuted
                             onClicked: {
-                                // layoutIdx = (layoutIdx + 1) % layouts.length;
                                 statusBar.exec(["niri", "msg", "action", "switch-layout", "next"]);
                             }
                         }
@@ -350,68 +360,31 @@ Variants {
                     // ==========================================
                     // MODULES RIGHT
                     // ==========================================
-                    Row {
-                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                        spacing: 2
-
-                        BarModule {
-                            text: "󰂜"
-                            textColor: statusBar.colTextMain
-                            onClicked: mouse => {
-                                if (mouse.button === Qt.LeftButton)
-                                    statusBar.exec(["swaync-client", "-t", "-sw"]);
-                                else if (mouse.button === Qt.RightButton)
-                                    statusBar.exec(["swaync-client", "-d", "-sw"]);
-                            }
-                        }
-
-                        BarModule {
-                            text: " " + statusBar.mediaStatus
-                            textColor: statusBar.colAccent
-                            implicitWidth: Math.min(moduleText.implicitWidth + 18, 200)
-                            onClicked: statusBar.exec(["playerctl", "play-pause"])
-                        }
-
-                        BarModule {
-                            text: "󰂯"
-                            textColor: statusBar.colAccent
-                            onClicked: statusBar.exec(["kitty", "--app-id=bluetui", "bluetui"])
-                        }
-
-                        BarModule {
-                            text: "󰤢"
-                            textColor: statusBar.colTextMain
-                            onClicked: statusBar.exec(["kitty", "--app-id=impala", "impala"])
-                        }
-
-                        BarModule {
-                            text: ""
-                            textColor: statusBar.colTextMain
-                            onClicked: mouse => {
-                                if (mouse.button === Qt.LeftButton)
-                                    statusBar.exec(["kitty", "--app-id=wiremix", "-e", "wiremix"]);
-                                else if (mouse.button === Qt.RightButton)
-                                    statusBar.exec(["pactl", "set-sink-mute", "@DEFAULT-SINK@", "toggle"]);
-                            }
-                        }
-
-                        BarModule {
-                            text: ""
-                            textColor: statusBar.colSuccess
-                        }
+                    RowLayout {
+                        id: bottomRow
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        spacing: 6
 
                         Row {
                             spacing: 4
-                            anchors.verticalCenter: parent.verticalCenter
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                            // anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
                                 model: SystemTray.items
 
                                 delegate: Item {
+                                    id: trayItem
                                     required property SystemTrayItem modelData
 
                                     width: 22
                                     height: 22
+
+                                    // 1. Declare the anchor inside Quickshell's QML engine
+                                    QsMenuAnchor {
+                                        id: trayMenuAnchor
+                                        menu: trayItem.modelData.menu
+                                    }
 
                                     Rectangle {
                                         anchors.fill: parent
@@ -425,12 +398,13 @@ Variants {
                                             fillMode: Image.PreserveAspectFit
                                             smooth: true
                                             source: {
-                                                if (!modelData.icon)
+                                                if (!trayItem.modelData.icon)
                                                     return "";
-                                                if (modelData.icon.startsWith("/") || modelData.icon.startsWith("file://")) {
-                                                    return modelData.icon;
+                                                if (trayItem.modelData.icon.startsWith("/") || trayItem.modelData.icon.startsWith("file://")) {
+                                                    return trayItem.modelData.icon;
                                                 }
-                                                return "image://icon/" + modelData.icon;
+                                                // return "image://icon/" + trayItem.modelData.icon;
+                                                return trayItem.modelData.icon;
                                             }
                                         }
 
@@ -442,9 +416,9 @@ Variants {
 
                                             onClicked: mouse => {
                                                 if (mouse.button === Qt.LeftButton) {
-                                                    modelData.activate();
-                                                } else if (mouse.button === Qt.RightButton && modelData.hasMenu) {
-                                                    modelData.menu.open();
+                                                    trayItem.modelData.activate();
+                                                } else if (mouse.button === Qt.RightButton && trayItem.modelData.hasMenu) {
+                                                    trayItem.modelData.display(statusBar, 0, 0);
                                                 }
                                             }
                                         }
@@ -452,6 +426,64 @@ Variants {
                                 }
                             }
                         }
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                        Row {
+                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                            spacing: 2
+
+                            BarModule {
+                                text: "󰂜"
+                                textColor: statusBar.colTextMain
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.LeftButton)
+                                        statusBar.exec(["swaync-client", "-t", "-sw"]);
+                                    else if (mouse.button === Qt.RightButton)
+                                        statusBar.exec(["swaync-client", "-d", "-sw"]);
+                                }
+                            }
+
+                            BarModule {
+                                text: " " + statusBar.mediaStatus
+                                textColor: statusBar.colAccent
+                                implicitWidth: Math.min(moduleText.implicitWidth + 18, 200)
+                                onClicked: statusBar.exec(["playerctl", "play-pause"])
+                            }
+
+                            BarModule {
+                                text: "󰂯"
+                                textColor: statusBar.colAccent
+                                onClicked: statusBar.exec(["kitty", "--app-id=bluetui", "bluetui"])
+                            }
+
+                            BarModule {
+                                text: "󰤢"
+                                textColor: statusBar.colTextMain
+                                onClicked: statusBar.exec(["kitty", "--app-id=impala", "impala"])
+                            }
+
+                            BarModule {
+                                text: ""
+                                textColor: statusBar.colTextMain
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.LeftButton)
+                                        statusBar.exec(["kitty", "--app-id=wiremix", "-e", "wiremix"]);
+                                    else if (mouse.button === Qt.RightButton)
+                                        statusBar.exec(["pactl", "set-sink-mute", "@DEFAULT-SINK@", "toggle"]);
+                                }
+                            }
+
+                            BarModule {
+                                text: ""
+                                textColor: statusBar.colSuccess
+                            }
+                        }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
                     }
                 }
             }
