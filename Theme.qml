@@ -2,5 +2,5 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    property color accentColor: "#c00020"
+    property color accentColor: "#695a66"
 }

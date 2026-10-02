@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set your active network interface
-INTERFACE="wlan2"
+INTERFACE="wlan0"
 
 # Helper function to convert bytes into human-readable strings natively
 format_speed() {

@@ -13,9 +13,6 @@ Variants {
             id: statusBar
 
             required property var modelData
-            required property bool isVisible
-            isVisible: true
-
             screen: modelData
 
             // anchors {
@@ -24,7 +21,7 @@ Variants {
             //     right: true
             // }
 
-            visible: true
+            visible: ShellState.isWidgetsActive
             color: "transparent"
             implicitHeight: screen.height / 6
             implicitWidth: screen.width / 3
@@ -447,7 +444,7 @@ Variants {
                             BarModule {
                                 text: " " + statusBar.mediaStatus
                                 textColor: statusBar.colAccent
-                                implicitWidth: Math.min(moduleText.implicitWidth + 18, 200)
+                                implicitWidth: Math.min(textItem.implicitWidth + 18, 200)
                                 onClicked: statusBar.exec(["playerctl", "play-pause"])
                             }
 
@@ -495,6 +492,7 @@ Variants {
         property alias text: moduleText.text
         property alias textColor: moduleText.color
         property alias fontBold: moduleText.font.bold
+        property alias textItem: moduleText
         signal clicked(var mouse)
 
         implicitWidth: moduleText.implicitWidth + 18

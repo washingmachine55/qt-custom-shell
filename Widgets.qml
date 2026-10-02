@@ -1,10 +1,11 @@
 import Quickshell
+import Quickshell.Widgets
 import Quickshell.Io
 import QtQuick
 import QtQuick.Controls.Material
+import QtQuick.Effects
 import Quickshell.Wayland
 // import QtQuick.Layouts
-import './Theme.qml'
 
 Variants {
     // Create the panel once on each monitor.
@@ -19,11 +20,14 @@ Variants {
         aboveWindows: false
         Material.theme: Material.Dark
         WlrLayershell.layer: WlrLayer.Bottom
-        mask: Region {}
+        mask: Region {
+            item: testReckt
+        }
 
         property var modelData
         screen: modelData
 
+        property bool isWidgetsActive: true
         property string timerValue: ""
 
         Process {
@@ -33,6 +37,16 @@ Variants {
                 onRead: data => {
                     widgets.timerValue = data.trim();
                 }
+            }
+        }
+
+        property bool isDarkScheme: false
+
+        Process {
+            running: true
+            command: ["sh", "-c", "gsettings get org.gnome.desktop.interface color-scheme; exec gsettings monitor org.gnome.desktop.interface color-scheme"]
+            stdout: SplitParser {
+                onRead: data => widgets.isDarkScheme = data.includes("prefer-dark")
             }
         }
 
@@ -46,6 +60,41 @@ Variants {
             }
         }
 
+        Rectangle {
+            id: testReckt
+            property string lockClosed: "file://home/devmed/qt-custom-shell/icons/lock-keyhole.png"
+            property string lockOpen: "file://home/devmed/qt-custom-shell/icons/lock-keyhole-open.png"
+            signal clicked(var mouse)
+            implicitHeight: 80
+            implicitWidth: 80
+            x: widgets.implicitWidth - 80 -80
+            y: widgets.implicitHeight - widgets.implicitHeight + 80
+            opacity: 0.75
+            color: "transparent"
+            IconImage {
+                id: lockIcon
+                asynchronous: true
+                layer.enabled: widgets.isDarkScheme
+                layer.effect: MultiEffect {
+                    brightness: 1.0
+                }
+                source: ShellState.isWidgetsActive ? testReckt.lockOpen : testReckt.lockClosed
+                transformOrigin: Item.Center
+                height: 24
+                width: 24
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            MouseArea {
+                id: moduleArea2
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+
+                onClicked: ShellState.isWidgetsActive = !ShellState.isWidgetsActive
+            }
+        }
+
         Item {
             property real margin: 5
 
@@ -56,6 +105,7 @@ Variants {
 
             Rectangle {
                 id: child
+                visible: ShellState.isWidgetsActive
 
                 // Set the size of the child item relative to the actual size
                 // of the parent item. If the parent item is constrained

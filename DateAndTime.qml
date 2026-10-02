@@ -3,7 +3,6 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Material
 import Quickshell.Wayland
-import './Theme.qml'
 
 ShellRoot {
     Variants {
