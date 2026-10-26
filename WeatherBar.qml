@@ -12,8 +12,9 @@ ShellRoot {
     readonly property real longitude: 74.3587
     readonly property bool fahrenheit: false
     readonly property int panelWidth: 360
+    readonly property int overshootPad: 40
     readonly property int triggerWidth: 6        // px hover strip on the screen edge
-    readonly property int openDelay: 120         // ms hover before opening
+    readonly property int openDelay: 350         // ms hover before opening
     readonly property int closeDelay: 350        // ms after leaving before closing
     readonly property int refreshMinutes: 15
     readonly property string fontFamily: "Rubik" // falls back to default if missing
@@ -44,6 +45,11 @@ ShellRoot {
     function stage(i) {
         const t = Math.max(0, Math.min(1, (reveal - i * 0.09) / 0.55));
         return 1 - Math.pow(1 - t, 3);
+    }
+
+    function spring(i) {   // ease-out-back
+        const t = Math.max(0, Math.min(1, (reveal - i * 0.09) / 0.55));
+        return 1 + 2.9 * Math.pow(t - 1, 3) + 1.9 * Math.pow(t - 1, 2);
     }
 
     onHoveredChanged: {
@@ -192,7 +198,8 @@ ShellRoot {
 
         // Only anchored right → compositor centers it vertically.
         anchors.right: true
-        implicitWidth: weatherBar.panelWidth
+        // implicitWidth: weatherBar.panelWidth
+        implicitWidth: weatherBar.panelWidth + weatherBar.overshootPad
         implicitHeight: content.implicitHeight + 48
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
@@ -209,7 +216,8 @@ ShellRoot {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            width: weatherBar.open ? win.width : weatherBar.triggerWidth
+            // width: weatherBar.open ? win.width : weatherBar.triggerWidth
+            width: weatherBar.open ? weatherBar.panelWidth : weatherBar.triggerWidth
         }
 
         Item {
@@ -226,16 +234,24 @@ ShellRoot {
             height: parent.height
             radius: 28
             color: weatherBar.cSurface
-            opacity: Math.min(1, weatherBar.reveal * 5)
+            // opacity: Math.min(1, weatherBar.reveal * 5)
+            opacity: Math.max(Math.min(1, weatherBar.reveal * 5), weatherBar.hovered ? 1 : 0)
+            transformOrigin: Item.Right
+            scale: 0.94 + 0.06 * weatherBar.spring(0)
 
-            x: weatherBar.open ? 0 : weatherBar.panelWidth + 24
+            // x: weatherBar.open ? 0 : weatherBar.panelWidth + 24
+            // x: weatherBar.open ? weatherBar.overshootPad : weatherBar.panelWidth + weatherBar.overshootPad + 24
+            x: weatherBar.open ? weatherBar.overshootPad
+                : weatherBar.hovered ? weatherBar.panelWidth + weatherBar.overshootPad - 16
+                : weatherBar.panelWidth + weatherBar.overshootPad + 24
             Behavior on x {
                 NumberAnimation {
-                    duration: weatherBar.open ? 520 : 300
+                    duration: weatherBar.open ? 700 : 300
                     easing.type: Easing.BezierSpline
                     // M3 emphasized decelerate / accelerate
                     easing.bezierCurve: weatherBar.open
-                        ? [0.05, 0.7, 0.1, 1.0, 1.0, 1.0]
+                        // ? [0.05, 0.7, 0.1, 1.0, 1.0, 1.0]
+                        ? [0.3, 1.5, 0.45, 1.0, 1.0, 1.0]
                         : [0.3, 0.0, 0.8, 0.15, 1.0, 1.0]
                 }
             }
@@ -261,7 +277,7 @@ ShellRoot {
                 RowLayout {
                     Layout.fillWidth: true
                     opacity: weatherBar.stage(0)
-                    transform: Translate { y: (1 - weatherBar.stage(0)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(0)) * 48 }
 
                     ColumnLayout {
                         spacing: 0
@@ -336,7 +352,7 @@ ShellRoot {
                     visible: weatherBar.weather !== null
                     radius: 24
                     opacity: weatherBar.stage(1)
-                    transform: Translate { y: (1 - weatherBar.stage(1)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(1)) * 48 }
 
                     gradient: Gradient {
                         orientation: Gradient.Horizontal
@@ -384,6 +400,7 @@ ShellRoot {
                                 anchors.centerIn: parent
                                 text: weatherBar.weather ? weatherBar.info(weatherBar.weather.code, weatherBar.weather.day).icon : ""
                                 font.pixelSize: 76
+                                scale: 0.4 + 0.6 * weatherBar.spring(1)
 
                                 // Gentle idle float, only while visible
                                 SequentialAnimation on anchors.verticalCenterOffset {
@@ -405,7 +422,7 @@ ShellRoot {
                     rowSpacing: 10
                     columnSpacing: 10
                     opacity: weatherBar.stage(2)
-                    transform: Translate { y: (1 - weatherBar.stage(2)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(2)) * 48 }
 
                     Repeater {
                         model: weatherBar.weather ? [
@@ -457,7 +474,7 @@ ShellRoot {
                     radius: 20
                     color: weatherBar.cContainer
                     opacity: weatherBar.stage(3)
-                    transform: Translate { y: (1 - weatherBar.stage(3)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(3)) * 48 }
 
                     RowLayout {
                         anchors.fill: parent
@@ -506,7 +523,7 @@ ShellRoot {
                     radius: 20
                     color: weatherBar.cContainer
                     opacity: weatherBar.stage(4)
-                    transform: Translate { y: (1 - weatherBar.stage(4)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(4)) * 48 }
 
                     ColumnLayout {
                         id: dailyCol
@@ -588,7 +605,7 @@ ShellRoot {
                     Layout.fillWidth: true
                     visible: weatherBar.weather !== null
                     opacity: weatherBar.stage(5)
-                    transform: Translate { y: (1 - weatherBar.stage(5)) * 18 }
+                    transform: Translate { x: (1 - weatherBar.spring(5)) * 48 }
 
                     Text {
                         text: "🌅 " + (weatherBar.weather ? weatherBar.weather.sunrise : "")
