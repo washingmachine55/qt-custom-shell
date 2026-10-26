@@ -9,4 +9,5 @@ ShellRoot {
     // Activate	   { id: w }
     Widgets        { id: widgets }
     // StatusBar      { id: statusBar }
+    WeatherBar        { id: weatherBar }
 }
