@@ -62,8 +62,8 @@ Variants {
 
         Rectangle {
             id: testReckt
-            property string lockClosed: "file:///home/hmed42/Documents/qt-custom-shell/icons/lock-keyhole.png"
-            property string lockOpen: "file://home/hmed42/Documents/qt-custom-shell/icons/lock-keyhole-open.png"
+            property string lockClosed: "icons/lock-keyhole.png"
+            property string lockOpen: "icons/lock-keyhole-open.png"
             signal clicked(var mouse)
             implicitHeight: 80
             implicitWidth: 80
@@ -78,7 +78,7 @@ Variants {
                 layer.effect: MultiEffect {
                     brightness: 1.0
                 }
-                source: ShellState.isWidgetsActive ? testReckt.lockOpen : testReckt.lockClosed
+                source: ShellState.isWidgetsActive ? Qt.resolvedUrl(testReckt.lockOpen) : Qt.resolvedUrl(testReckt.lockClosed)
                 transformOrigin: Item.Center
                 height: 24
                 width: 24
