@@ -27,9 +27,6 @@ ShellRoot {
             ColumnLayout {
                 id: content
                 spacing: -20
-                // x: Math.floor(Math.random() * (Math.floor(max)- Math.ceil(min) + 1)) + Math.ceil(min);
-                // x: Math.floor(Math.random() * (Math.floor(1580)- Math.ceil(50) + 1)) + Math.ceil(50);
-                // y: Math.floor(Math.random() * (Math.floor(850)- Math.ceil(50) + 1)) + Math.ceil(50);
                 x: dateAndTime.implicitWidth / 4 ;
                 y: dateAndTime.implicitHeight / 4 ;
 
@@ -58,21 +55,21 @@ ShellRoot {
                     font.weight: 990
                     font.letterSpacing: -7
                     font.italic: true
-                    // color: '#000000'
-                    color: Theme.accentColor
+                    color: Colors.md3.primary_fixed
+                    opacity: 0.95
                     transformOrigin: Item.Center
                     renderType: Text.NativeRendering
                     smooth: true
                 }
                 Text {
                     id: clockdate
-                    // text: Qt.formatDateTime(clock.date, "  ddd, dd/MM")
                     text: Qt.formatDateTime(clock.date, "  ddd, MMM dd")
                     font.pixelSize: 30
                     font.family: "zalando sans expanded"
                     font.weight: 500
                     font.letterSpacing: -1
-                    color: Theme.accentColor
+                    color: Colors.md3.primary_fixed_dim
+                    opacity: 0.95
                     transformOrigin: Item.Center
                     renderType: Text.NativeRendering
                     smooth: true
@@ -87,9 +84,6 @@ ShellRoot {
                     running: true
                     triggeredOnStart: true
                     onTriggered: {
-                        // clocktime.text = Qt.formatTime(new Date(), "hh:mm:ss ");
-                        // content.x = Math.floor(Math.random() * (Math.floor(1580)- Math.ceil(50) + 1)) + Math.ceil(50);
-                        // content.y = Math.floor(Math.random() * (Math.floor(850)- Math.ceil(50) + 1)) + Math.ceil(50);
                         content.x = Math.floor(Math.random() * (Math.floor(dateAndTime.implicitWidth / 2)- Math.ceil(50) + 1)) + Math.ceil(50);
                         content.y = Math.floor(Math.random() * (Math.floor(dateAndTime.implicitHeight / 2)- Math.ceil(50) + 1)) + Math.ceil(50);
                     }

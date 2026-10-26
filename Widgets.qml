@@ -62,8 +62,8 @@ Variants {
 
         Rectangle {
             id: testReckt
-            property string lockClosed: "file://home/devmed/qt-custom-shell/icons/lock-keyhole.png"
-            property string lockOpen: "file://home/devmed/qt-custom-shell/icons/lock-keyhole-open.png"
+            property string lockClosed: "file:///home/hmed42/Documents/qt-custom-shell/icons/lock-keyhole.png"
+            property string lockOpen: "file://home/hmed42/Documents/qt-custom-shell/icons/lock-keyhole-open.png"
             signal clicked(var mouse)
             implicitHeight: 80
             implicitWidth: 80
@@ -116,7 +116,7 @@ Variants {
                 width: 350
                 height: 75
                 radius: 20.0
-                border.color: Theme.accentColor
+                border.color: Colors.md3.inverse_primary
                 border.width: 1
 
                 // The child's implicit / desired size, which will be respected
