@@ -1,6 +1,7 @@
 //@ pragma UseQApplication
 import Quickshell
 import QtQuick
+import "./dock"
 
 ShellRoot {
     RoundedOverlay { id: roundedOverlay }
@@ -10,4 +11,5 @@ ShellRoot {
     Widgets        { id: widgets }
     // StatusBar      { id: statusBar }
     WeatherBar        { id: weatherBar }
+    DockEntrypoint        { id: rootEntrypoint }
 }
