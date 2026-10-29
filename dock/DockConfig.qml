@@ -5,7 +5,7 @@ QtObject {
     // Supported: "bottom", "top", "left", "right"
     property string edge: "bottom"
 
-    property int iconSize: 48
+    property int iconSize: 28
     property int iconSpacing: 10
     property int padding: 12
     property int edgeMargin: 10
@@ -30,6 +30,13 @@ QtObject {
             appId: "org.gnome.Nautilus",
             desktopId: "org.gnome.Nautilus",
             icon: "org.gnome.Nautilus",
+            customIcon: ""
+        },
+        {
+            name: "Zed Editor",
+            appId: "dev.zed.Zed",
+            desktopId: "dev.zed.Zed",
+            icon: "zed",
             customIcon: ""
         }
     ]

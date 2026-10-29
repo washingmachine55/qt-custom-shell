@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 
-ShellRoot {
+Scope {
     id: weatherBar
 
     // ───────────── Config ─────────────
@@ -193,432 +193,439 @@ ShellRoot {
     readonly property string wUnit: fahrenheit ? "mph" : "km/h"
 
     // ───────────── Window ─────────────
-    PanelWindow {
-        id: win
+    Variants {
+        // Rightmost screen only: an inner right edge can't catch the cursor.
+        model: Quickshell.screens.filter(s => s.x + s.width === Math.max(...Quickshell.screens.map(o => o.x + o.width))).slice(0, 1)
 
-        // Only anchored right → compositor centers it vertically.
-        anchors.right: true
-        // implicitWidth: weatherBar.panelWidth
-        implicitWidth: weatherBar.panelWidth + weatherBar.overshootPad
-        implicitHeight: content.implicitHeight + 48
-        color: "transparent"
-        exclusionMode: ExclusionMode.Ignore
+        PanelWindow {
+            id: win
+            required property var modelData
+            screen: modelData
 
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "weather-panel"
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            // Only anchored right → compositor centers it vertically.
+            anchors.right: true
+            // implicitWidth: weatherBar.panelWidth
+            implicitWidth: weatherBar.panelWidth + weatherBar.overshootPad
+            implicitHeight: content.implicitHeight + 48
+            color: "transparent"
+            exclusionMode: ExclusionMode.Ignore
 
-        // Hidden: only a thin strip on the edge takes input. Open: whole panel.
-        mask: Region { item: hit }
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "weather-panel"
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        Item {
-            id: hit
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            // width: weatherBar.open ? win.width : weatherBar.triggerWidth
-            width: weatherBar.open ? weatherBar.panelWidth : weatherBar.triggerWidth
-        }
+            // Hidden: only a thin strip on the edge takes input. Open: whole panel.
+            mask: Region { item: hit }
 
-        Item {
-            anchors.fill: parent
-            HoverHandler {
-                onHoveredChanged: weatherBar.hovered = hovered
-            }
-        }
-
-        // ── Sliding panel ──
-        Rectangle {
-            id: panel
-            width: weatherBar.panelWidth
-            height: parent.height
-            radius: 28
-            color: weatherBar.cSurface
-            // opacity: Math.min(1, weatherBar.reveal * 5)
-            opacity: Math.max(Math.min(1, weatherBar.reveal * 5), weatherBar.hovered ? 1 : 0)
-            transformOrigin: Item.Right
-            scale: 0.94 + 0.06 * weatherBar.spring(0)
-
-            // x: weatherBar.open ? 0 : weatherBar.panelWidth + 24
-            // x: weatherBar.open ? weatherBar.overshootPad : weatherBar.panelWidth + weatherBar.overshootPad + 24
-            x: weatherBar.open ? weatherBar.overshootPad
-                : weatherBar.hovered ? weatherBar.panelWidth + weatherBar.overshootPad - 16
-                : weatherBar.panelWidth + weatherBar.overshootPad + 24
-            Behavior on x {
-                NumberAnimation {
-                    duration: weatherBar.open ? 700 : 300
-                    easing.type: Easing.BezierSpline
-                    // M3 emphasized decelerate / accelerate
-                    easing.bezierCurve: weatherBar.open
-                        // ? [0.05, 0.7, 0.1, 1.0, 1.0, 1.0]
-                        ? [0.3, 1.5, 0.45, 1.0, 1.0, 1.0]
-                        : [0.3, 0.0, 0.8, 0.15, 1.0, 1.0]
-                }
-            }
-
-            // Flatten the corners that touch the screen edge
-            Rectangle {
-                anchors.right: parent.right
-                width: 28
-                height: parent.height
-                color: weatherBar.cSurface
-            }
-
-            ColumnLayout {
-                id: content
-                anchors.left: parent.left
-                anchors.right: parent.right
+            Item {
+                id: hit
                 anchors.top: parent.top
-                anchors.margins: 22
-                anchors.topMargin: 24
-                spacing: 14
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                // width: weatherBar.open ? win.width : weatherBar.triggerWidth
+                width: weatherBar.open ? weatherBar.panelWidth : weatherBar.triggerWidth
+            }
 
-                // ── 0: Header ──
-                RowLayout {
-                    Layout.fillWidth: true
-                    opacity: weatherBar.stage(0)
-                    transform: Translate { x: (1 - weatherBar.spring(0)) * 48 }
+            Item {
+                anchors.fill: parent
+                HoverHandler {
+                    onHoveredChanged: weatherBar.hovered = hovered
+                }
+            }
 
-                    ColumnLayout {
-                        spacing: 0
-                        Text {
-                            text: weatherBar.city
-                            color: weatherBar.cOnSurface
-                            font.family: weatherBar.fontFamily
-                            font.pixelSize: 20
-                            font.weight: Font.Medium
-                        }
-                        Text {
-                            text: weatherBar.loading ? "Updating…"
-                            : weatherBar.lastFetch > 0 ? "Updated " + Qt.formatTime(new Date(weatherBar.lastFetch), "hh:mm")
-                                : ""
-                            color: weatherBar.cOnVariant
-                            font.family: weatherBar.fontFamily
-                            font.pixelSize: 12
-                        }
-                    }
-                    Item { Layout.fillWidth: true }
+            // ── Sliding panel ──
+            Rectangle {
+                id: panel
+                width: weatherBar.panelWidth
+                height: parent.height
+                radius: 28
+                color: weatherBar.cSurface
+                // opacity: Math.min(1, weatherBar.reveal * 5)
+                opacity: Math.max(Math.min(1, weatherBar.reveal * 5), weatherBar.hovered ? 1 : 0)
+                transformOrigin: Item.Right
+                scale: 0.94 + 0.06 * weatherBar.spring(0)
 
-                    Rectangle {
-                        Layout.preferredWidth: 36
-                        Layout.preferredHeight: 36
-                        radius: 18
-                        color: refreshArea.containsMouse ? weatherBar.cContainerHi : weatherBar.cContainer
-                        scale: refreshArea.pressed ? 0.9 : 1
-                        Behavior on color { ColorAnimation { duration: 150 } }
-                        Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
-
-                        Text {
-                            id: spinner
-                            anchors.centerIn: parent
-                            text: "↻"
-                            color: weatherBar.cPrimary
-                            font.pixelSize: 20
-                            NumberAnimation on rotation {
-                                from: 0; to: 360; duration: 900
-                                loops: Animation.Infinite
-                                running: weatherBar.loading
-                                onRunningChanged: if (!running) spinner.rotation = 0
-                            }
-                        }
-                        MouseArea {
-                            id: refreshArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: weatherBar.fetchWeather()
-                        }
+                // x: weatherBar.open ? 0 : weatherBar.panelWidth + 24
+                // x: weatherBar.open ? weatherBar.overshootPad : weatherBar.panelWidth + weatherBar.overshootPad + 24
+                x: weatherBar.open ? weatherBar.overshootPad
+                    : weatherBar.hovered ? weatherBar.panelWidth + weatherBar.overshootPad - 16
+                    : weatherBar.panelWidth + weatherBar.overshootPad + 24
+                Behavior on x {
+                    NumberAnimation {
+                        duration: weatherBar.open ? 700 : 300
+                        easing.type: Easing.BezierSpline
+                        // M3 emphasized decelerate / accelerate
+                        easing.bezierCurve: weatherBar.open
+                            // ? [0.05, 0.7, 0.1, 1.0, 1.0, 1.0]
+                            ? [0.3, 1.5, 0.45, 1.0, 1.0, 1.0]
+                            : [0.3, 0.0, 0.8, 0.15, 1.0, 1.0]
                     }
                 }
 
-                // ── Status (loading / error) ──
-                Text {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 160
-                    visible: weatherBar.weather === null
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    wrapMode: Text.WordWrap
-                    text: weatherBar.error !== "" ? weatherBar.error + "\nClick ↻ to retry" : "Loading weather…"
-                    color: weatherBar.cOnVariant
-                    font.family: weatherBar.fontFamily
-                    font.pixelSize: 14
-                }
-
-                // ── 1: Hero ──
+                // Flatten the corners that touch the screen edge
                 Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 150
-                    visible: weatherBar.weather !== null
-                    radius: 24
-                    opacity: weatherBar.stage(1)
-                    transform: Translate { x: (1 - weatherBar.spring(1)) * 48 }
+                    anchors.right: parent.right
+                    width: 28
+                    height: parent.height
+                    color: weatherBar.cSurface
+                }
 
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop {
-                            position: 0
-                            color: weatherBar.weather ? weatherBar.tint(weatherBar.weather.code, weatherBar.weather.day) : weatherBar.cContainer
-                            Behavior on color { ColorAnimation { duration: 600 } }
-                        }
-                        GradientStop { position: 1; color: weatherBar.cContainer }
-                    }
+                ColumnLayout {
+                    id: content
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: 22
+                    anchors.topMargin: 24
+                    spacing: 14
 
+                    // ── 0: Header ──
                     RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 18
+                        Layout.fillWidth: true
+                        opacity: weatherBar.stage(0)
+                        transform: Translate { x: (1 - weatherBar.spring(0)) * 48 }
 
                         ColumnLayout {
                             spacing: 0
                             Text {
-                                text: weatherBar.weather ? weatherBar.weather.temp + "°" : ""
+                                text: weatherBar.city
                                 color: weatherBar.cOnSurface
                                 font.family: weatherBar.fontFamily
-                                font.pixelSize: 64
-                                font.weight: Font.Light
-                            }
-                            Text {
-                                text: weatherBar.weather ? weatherBar.info(weatherBar.weather.code, weatherBar.weather.day).text : ""
-                                color: weatherBar.cOnSurface
-                                font.family: weatherBar.fontFamily
-                                font.pixelSize: 16
+                                font.pixelSize: 20
                                 font.weight: Font.Medium
                             }
                             Text {
-                                text: weatherBar.weather ? "Feels like " + weatherBar.weather.feels + weatherBar.tUnit : ""
+                                text: weatherBar.loading ? "Updating…"
+                                : weatherBar.lastFetch > 0 ? "Updated " + Qt.formatTime(new Date(weatherBar.lastFetch), "hh:mm")
+                                    : ""
                                 color: weatherBar.cOnVariant
                                 font.family: weatherBar.fontFamily
                                 font.pixelSize: 12
                             }
                         }
                         Item { Layout.fillWidth: true }
-                        Item {
-                            Layout.preferredWidth: 96
-                            Layout.preferredHeight: 96
-                            Text {
-                                id: heroIcon
-                                anchors.centerIn: parent
-                                text: weatherBar.weather ? weatherBar.info(weatherBar.weather.code, weatherBar.weather.day).icon : ""
-                                font.pixelSize: 76
-                                scale: 0.4 + 0.6 * weatherBar.spring(1)
 
-                                // Gentle idle float, only while visible
-                                SequentialAnimation on anchors.verticalCenterOffset {
-                                    running: weatherBar.open
+                        Rectangle {
+                            Layout.preferredWidth: 36
+                            Layout.preferredHeight: 36
+                            radius: 18
+                            color: refreshArea.containsMouse ? weatherBar.cContainerHi : weatherBar.cContainer
+                            scale: refreshArea.pressed ? 0.9 : 1
+                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutBack } }
+
+                            Text {
+                                id: spinner
+                                anchors.centerIn: parent
+                                text: "↻"
+                                color: weatherBar.cPrimary
+                                font.pixelSize: 20
+                                NumberAnimation on rotation {
+                                    from: 0; to: 360; duration: 900
                                     loops: Animation.Infinite
-                                    NumberAnimation { to: -5; duration: 1800; easing.type: Easing.InOutSine }
-                                    NumberAnimation { to: 5; duration: 1800; easing.type: Easing.InOutSine }
+                                    running: weatherBar.loading
+                                    onRunningChanged: if (!running) spinner.rotation = 0
+                                }
+                            }
+                            MouseArea {
+                                id: refreshArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: weatherBar.fetchWeather()
+                            }
+                        }
+                    }
+
+                    // ── Status (loading / error) ──
+                    Text {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 160
+                        visible: weatherBar.weather === null
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        wrapMode: Text.WordWrap
+                        text: weatherBar.error !== "" ? weatherBar.error + "\nClick ↻ to retry" : "Loading weather…"
+                        color: weatherBar.cOnVariant
+                        font.family: weatherBar.fontFamily
+                        font.pixelSize: 14
+                    }
+
+                    // ── 1: Hero ──
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 150
+                        visible: weatherBar.weather !== null
+                        radius: 24
+                        opacity: weatherBar.stage(1)
+                        transform: Translate { x: (1 - weatherBar.spring(1)) * 48 }
+
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop {
+                                position: 0
+                                color: weatherBar.weather ? weatherBar.tint(weatherBar.weather.code, weatherBar.weather.day) : weatherBar.cContainer
+                                Behavior on color { ColorAnimation { duration: 600 } }
+                            }
+                            GradientStop { position: 1; color: weatherBar.cContainer }
+                        }
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: 18
+
+                            ColumnLayout {
+                                spacing: 0
+                                Text {
+                                    text: weatherBar.weather ? weatherBar.weather.temp + "°" : ""
+                                    color: weatherBar.cOnSurface
+                                    font.family: weatherBar.fontFamily
+                                    font.pixelSize: 64
+                                    font.weight: Font.Light
+                                }
+                                Text {
+                                    text: weatherBar.weather ? weatherBar.info(weatherBar.weather.code, weatherBar.weather.day).text : ""
+                                    color: weatherBar.cOnSurface
+                                    font.family: weatherBar.fontFamily
+                                    font.pixelSize: 16
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: weatherBar.weather ? "Feels like " + weatherBar.weather.feels + weatherBar.tUnit : ""
+                                    color: weatherBar.cOnVariant
+                                    font.family: weatherBar.fontFamily
+                                    font.pixelSize: 12
+                                }
+                            }
+                            Item { Layout.fillWidth: true }
+                            Item {
+                                Layout.preferredWidth: 96
+                                Layout.preferredHeight: 96
+                                Text {
+                                    id: heroIcon
+                                    anchors.centerIn: parent
+                                    text: weatherBar.weather ? weatherBar.info(weatherBar.weather.code, weatherBar.weather.day).icon : ""
+                                    font.pixelSize: 76
+                                    scale: 0.4 + 0.6 * weatherBar.spring(1)
+
+                                    // Gentle idle float, only while visible
+                                    SequentialAnimation on anchors.verticalCenterOffset {
+                                        running: weatherBar.open
+                                        loops: Animation.Infinite
+                                        NumberAnimation { to: -5; duration: 1800; easing.type: Easing.InOutSine }
+                                        NumberAnimation { to: 5; duration: 1800; easing.type: Easing.InOutSine }
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // ── 2: Stats ──
-                GridLayout {
-                    Layout.fillWidth: true
-                    visible: weatherBar.weather !== null
-                    columns: 2
-                    rowSpacing: 10
-                    columnSpacing: 10
-                    opacity: weatherBar.stage(2)
-                    transform: Translate { x: (1 - weatherBar.spring(2)) * 48 }
+                    // ── 2: Stats ──
+                    GridLayout {
+                        Layout.fillWidth: true
+                        visible: weatherBar.weather !== null
+                        columns: 2
+                        rowSpacing: 10
+                        columnSpacing: 10
+                        opacity: weatherBar.stage(2)
+                        transform: Translate { x: (1 - weatherBar.spring(2)) * 48 }
 
-                    Repeater {
-                        model: weatherBar.weather ? [
-                        { icon: "💧", label: "Humidity", value: weatherBar.weather.humidity + "%" },
-                        { icon: "💨", label: "Wind", value: weatherBar.weather.wind + " " + weatherBar.wUnit },
-                        { icon: "☔", label: "Rain chance", value: weatherBar.weather.rain + "%" },
-                        { icon: "🧭", label: "Pressure", value: weatherBar.weather.pressure + " hPa" }
-                        ] : []
+                        Repeater {
+                            model: weatherBar.weather ? [
+                            { icon: "💧", label: "Humidity", value: weatherBar.weather.humidity + "%" },
+                            { icon: "💨", label: "Wind", value: weatherBar.weather.wind + " " + weatherBar.wUnit },
+                            { icon: "☔", label: "Rain chance", value: weatherBar.weather.rain + "%" },
+                            { icon: "🧭", label: "Pressure", value: weatherBar.weather.pressure + " hPa" }
+                            ] : []
 
-                        delegate: Rectangle {
-                            required property var modelData
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 62
-                            radius: 18
-                            color: weatherBar.cContainer
+                            delegate: Rectangle {
+                                required property var modelData
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 62
+                                radius: 18
+                                color: weatherBar.cContainer
 
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 14
-                                anchors.rightMargin: 10
-                                spacing: 10
-                                Text { text: modelData.icon; font.pixelSize: 22 }
-                                ColumnLayout {
-                                    spacing: 0
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 14
+                                    anchors.rightMargin: 10
+                                    spacing: 10
+                                    Text { text: modelData.icon; font.pixelSize: 22 }
+                                    ColumnLayout {
+                                        spacing: 0
+                                        Text {
+                                            text: modelData.label
+                                            color: weatherBar.cOnVariant
+                                            font.family: weatherBar.fontFamily
+                                            font.pixelSize: 11
+                                        }
+                                        Text {
+                                            text: modelData.value
+                                            color: weatherBar.cOnSurface
+                                            font.family: weatherBar.fontFamily
+                                            font.pixelSize: 15
+                                            font.weight: Font.Medium
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // ── 3: Hourly ──
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 92
+                        visible: weatherBar.weather !== null
+                        radius: 20
+                        color: weatherBar.cContainer
+                        opacity: weatherBar.stage(3)
+                        transform: Translate { x: (1 - weatherBar.spring(3)) * 48 }
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            spacing: 0
+
+                            Repeater {
+                                model: weatherBar.weather ? weatherBar.weather.hours : []
+                                delegate: ColumnLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
+                                    spacing: 2
+                                    Item { Layout.fillHeight: true }
                                     Text {
+                                        Layout.alignment: Qt.AlignHCenter
                                         text: modelData.label
                                         color: weatherBar.cOnVariant
                                         font.family: weatherBar.fontFamily
-                                        font.pixelSize: 11
+                                        font.pixelSize: 10
                                     }
                                     Text {
-                                        text: modelData.value
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: weatherBar.info(modelData.code, modelData.day).icon
+                                        font.pixelSize: 22
+                                    }
+                                    Text {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: modelData.temp + "°"
                                         color: weatherBar.cOnSurface
                                         font.family: weatherBar.fontFamily
-                                        font.pixelSize: 15
+                                        font.pixelSize: 13
+                                        font.weight: Font.Medium
+                                    }
+                                    Item { Layout.fillHeight: true }
+                                }
+                            }
+                        }
+                    }
+
+                    // ── 4: Daily forecast ──
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: dailyCol.implicitHeight + 24
+                        visible: weatherBar.weather !== null
+                        radius: 20
+                        color: weatherBar.cContainer
+                        opacity: weatherBar.stage(4)
+                        transform: Translate { x: (1 - weatherBar.spring(4)) * 48 }
+
+                        ColumnLayout {
+                            id: dailyCol
+                            anchors.fill: parent
+                            anchors.margins: 12
+                            spacing: 4
+
+                            Repeater {
+                                model: weatherBar.weather ? weatherBar.weather.days : []
+                                delegate: RowLayout {
+                                    required property var modelData
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 30
+                                    spacing: 8
+
+                                    Text {
+                                        Layout.preferredWidth: 46
+                                        text: modelData.name
+                                        color: weatherBar.cOnSurface
+                                        font.family: weatherBar.fontFamily
+                                        font.pixelSize: 13
+                                    }
+                                    Text {
+                                        text: weatherBar.info(modelData.code, true).icon
+                                        font.pixelSize: 18
+                                    }
+                                    Text {
+                                        Layout.preferredWidth: 32
+                                        text: modelData.rain + "%"
+                                        color: weatherBar.cRain
+                                        font.family: weatherBar.fontFamily
+                                        font.pixelSize: 11
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+                                    Text {
+                                        Layout.preferredWidth: 26
+                                        text: modelData.min + "°"
+                                        color: weatherBar.cOnVariant
+                                        font.family: weatherBar.fontFamily
+                                        font.pixelSize: 12
+                                        horizontalAlignment: Text.AlignRight
+                                    }
+
+                                    // Min–max range bar (grows in with the reveal)
+                                    Item {
+                                        id: track
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: 6
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: 3
+                                            color: weatherBar.cContainerHi
+                                        }
+                                        Rectangle {
+                                            readonly property real span: Math.max(1, weatherBar.weather.gmax - weatherBar.weather.gmin)
+                                            height: parent.height
+                                            radius: 3
+                                            color: weatherBar.cPrimary
+                                            x: (modelData.min - weatherBar.weather.gmin) / span * track.width
+                                            width: Math.max(6, (modelData.max - modelData.min) / span * track.width) * weatherBar.stage(4)
+                                        }
+                                    }
+
+                                    Text {
+                                        Layout.preferredWidth: 26
+                                        text: modelData.max + "°"
+                                        color: weatherBar.cOnSurface
+                                        font.family: weatherBar.fontFamily
+                                        font.pixelSize: 12
                                         font.weight: Font.Medium
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                // ── 3: Hourly ──
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 92
-                    visible: weatherBar.weather !== null
-                    radius: 20
-                    color: weatherBar.cContainer
-                    opacity: weatherBar.stage(3)
-                    transform: Translate { x: (1 - weatherBar.spring(3)) * 48 }
-
+                    // ── 5: Sunrise / sunset ──
                     RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        spacing: 0
+                        Layout.fillWidth: true
+                        visible: weatherBar.weather !== null
+                        opacity: weatherBar.stage(5)
+                        transform: Translate { x: (1 - weatherBar.spring(5)) * 48 }
 
-                        Repeater {
-                            model: weatherBar.weather ? weatherBar.weather.hours : []
-                            delegate: ColumnLayout {
-                                required property var modelData
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                spacing: 2
-                                Item { Layout.fillHeight: true }
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: modelData.label
-                                    color: weatherBar.cOnVariant
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 10
-                                }
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: weatherBar.info(modelData.code, modelData.day).icon
-                                    font.pixelSize: 22
-                                }
-                                Text {
-                                    Layout.alignment: Qt.AlignHCenter
-                                    text: modelData.temp + "°"
-                                    color: weatherBar.cOnSurface
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 13
-                                    font.weight: Font.Medium
-                                }
-                                Item { Layout.fillHeight: true }
-                            }
+                        Text {
+                            text: "🌅 " + (weatherBar.weather ? weatherBar.weather.sunrise : "")
+                            color: weatherBar.cOnVariant
+                            font.family: weatherBar.fontFamily
+                            font.pixelSize: 12
                         }
-                    }
-                }
-
-                // ── 4: Daily forecast ──
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: dailyCol.implicitHeight + 24
-                    visible: weatherBar.weather !== null
-                    radius: 20
-                    color: weatherBar.cContainer
-                    opacity: weatherBar.stage(4)
-                    transform: Translate { x: (1 - weatherBar.spring(4)) * 48 }
-
-                    ColumnLayout {
-                        id: dailyCol
-                        anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 4
-
-                        Repeater {
-                            model: weatherBar.weather ? weatherBar.weather.days : []
-                            delegate: RowLayout {
-                                required property var modelData
-                                Layout.fillWidth: true
-                                Layout.preferredHeight: 30
-                                spacing: 8
-
-                                Text {
-                                    Layout.preferredWidth: 46
-                                    text: modelData.name
-                                    color: weatherBar.cOnSurface
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 13
-                                }
-                                Text {
-                                    text: weatherBar.info(modelData.code, true).icon
-                                    font.pixelSize: 18
-                                }
-                                Text {
-                                    Layout.preferredWidth: 32
-                                    text: modelData.rain + "%"
-                                    color: weatherBar.cRain
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 11
-                                    horizontalAlignment: Text.AlignRight
-                                }
-                                Text {
-                                    Layout.preferredWidth: 26
-                                    text: modelData.min + "°"
-                                    color: weatherBar.cOnVariant
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 12
-                                    horizontalAlignment: Text.AlignRight
-                                }
-
-                                // Min–max range bar (grows in with the reveal)
-                                Item {
-                                    id: track
-                                    Layout.fillWidth: true
-                                    Layout.preferredHeight: 6
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: 3
-                                        color: weatherBar.cContainerHi
-                                    }
-                                    Rectangle {
-                                        readonly property real span: Math.max(1, weatherBar.weather.gmax - weatherBar.weather.gmin)
-                                        height: parent.height
-                                        radius: 3
-                                        color: weatherBar.cPrimary
-                                        x: (modelData.min - weatherBar.weather.gmin) / span * track.width
-                                        width: Math.max(6, (modelData.max - modelData.min) / span * track.width) * weatherBar.stage(4)
-                                    }
-                                }
-
-                                Text {
-                                    Layout.preferredWidth: 26
-                                    text: modelData.max + "°"
-                                    color: weatherBar.cOnSurface
-                                    font.family: weatherBar.fontFamily
-                                    font.pixelSize: 12
-                                    font.weight: Font.Medium
-                                }
-                            }
+                        Item { Layout.fillWidth: true }
+                        Text {
+                            text: "🌇 " + (weatherBar.weather ? weatherBar.weather.sunset : "")
+                            color: weatherBar.cOnVariant
+                            font.family: weatherBar.fontFamily
+                            font.pixelSize: 12
                         }
-                    }
-                }
-
-                // ── 5: Sunrise / sunset ──
-                RowLayout {
-                    Layout.fillWidth: true
-                    visible: weatherBar.weather !== null
-                    opacity: weatherBar.stage(5)
-                    transform: Translate { x: (1 - weatherBar.spring(5)) * 48 }
-
-                    Text {
-                        text: "🌅 " + (weatherBar.weather ? weatherBar.weather.sunrise : "")
-                        color: weatherBar.cOnVariant
-                        font.family: weatherBar.fontFamily
-                        font.pixelSize: 12
-                    }
-                    Item { Layout.fillWidth: true }
-                    Text {
-                        text: "🌇 " + (weatherBar.weather ? weatherBar.weather.sunset : "")
-                        color: weatherBar.cOnVariant
-                        font.family: weatherBar.fontFamily
-                        font.pixelSize: 12
                     }
                 }
             }
