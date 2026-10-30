@@ -11,5 +11,5 @@ ShellRoot {
     Widgets        { id: widgets }
     // StatusBar      { id: statusBar }
     WeatherBar        { id: weatherBar }
-    // DockEntrypoint        { id: rootEntrypoint }
+    Dock           { id: dock }
 }
