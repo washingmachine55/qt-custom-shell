@@ -1,14 +1,18 @@
-import Quickshell
+import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls.Material
+import Quickshell
 import Quickshell.Wayland
-import Qt5Compat.GraphicalEffects
 
 Variants {
 	// Create the panel once on each monitor.
 	model: Quickshell.screens
+
 	PanelWindow {
 		id: roundedOverlay
+
+		property var modelData
+
 		focusable: false
 		visible: true
 		color: "transparent"
@@ -17,14 +21,14 @@ Variants {
 		aboveWindows: true
 		Material.theme: Material.Dark
 		WlrLayershell.layer: WlrLayer.Top
-		mask: Region {}
-
-		property var modelData
 		screen: modelData
+
+		mask: Region {}
 
 		// top-left
 		Image {
 			id: topLeftCorn
+
 			visible: false
 			anchors.left: parent.left
 			anchors.top: parent.top
@@ -35,15 +39,16 @@ Variants {
 		}
 
 		ColorOverlay {
-	        anchors.fill: topLeftCorn
-	        source: topLeftCorn
-	        color: Colors.md3.surface
+			anchors.fill: topLeftCorn
+			source: topLeftCorn
+			color: Colors.md3.surface
 			opacity: 0.85 // Change this to any desired color
-	    }
+		}
 
 		// top-right
 		Image {
 			id: topRightCorn
+
 			visible: false
 			anchors.right: parent.right
 			anchors.top: parent.top
@@ -54,17 +59,18 @@ Variants {
 		}
 
 		ColorOverlay {
-	        anchors.fill: topRightCorn
-	        source: topRightCorn
-	        color: Colors.md3.surface
+			anchors.fill: topRightCorn
+			source: topRightCorn
+			color: Colors.md3.surface
 			opacity: 0.85 // Change this to any desired color
 			rotation: 90
 			transformOrigin: Item.Center
-	    }
+		}
 
 		// bottom-right
 		Image {
 			id: bottomRightCorn
+
 			visible: false
 			anchors.right: parent.right
 			anchors.bottom: parent.bottom
@@ -77,17 +83,18 @@ Variants {
 		}
 
 		ColorOverlay {
-	        anchors.fill: bottomRightCorn
-	        source: bottomRightCorn
-	        color: Colors.md3.surface
+			anchors.fill: bottomRightCorn
+			source: bottomRightCorn
+			color: Colors.md3.surface
 			opacity: 0.85 // Change this to any desired color
 			rotation: 180
 			transformOrigin: Item.Center
-	    }
+		}
 
 		// bottom-left
 		Image {
 			id: bottomLeftCorn
+
 			visible: false
 			anchors.left: parent.left
 			anchors.bottom: parent.bottom
@@ -98,12 +105,12 @@ Variants {
 		}
 
 		ColorOverlay {
-	        anchors.fill: bottomLeftCorn
-	        source: bottomLeftCorn
-	        color: Colors.md3.surface
+			anchors.fill: bottomLeftCorn
+			source: bottomLeftCorn
+			color: Colors.md3.surface
 			opacity: 0.85 // Change this to any desired color
 			rotation: 270
 			transformOrigin: Item.Center
-	    }
+		}
 	}
 }
