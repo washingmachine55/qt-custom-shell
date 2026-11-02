@@ -8,6 +8,7 @@ Singleton {
 	property alias md3: jsonAdapter.md3
 	property alias base16: jsonAdapter.base16
 	property alias palette: jsonAdapter.palette
+	property real transparency: 0.85
 
 	FileView {
 		path: Quickshell.env("HOME") + "/.local/state/quickshell/generated/colors.json"

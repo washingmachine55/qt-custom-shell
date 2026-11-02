@@ -16,19 +16,19 @@ Singleton {
     // Also show apps that are open but not pinned.
     property bool showRunning: true
 
-    property int iconSize: 42
+    property int iconSize: 38
     property int spacing: 12      // gap between icons
-    property int padding: 12      // gap between icons and the dock's edge
+    property int padding: 14      // gap between icons and the dock's edge
     property int margin: 16       // gap between the dock and the screen edge
     property int radius: 20
-    property real opacity: 0.65  // background opacity, 0–1
+    property real opacity: 0.55  // background opacity, 0–1
 
     property real hoverScale: 1.15
     property bool bounceOnHover: true
 
     // Hide until the pointer touches the screen edge.
     property bool autoHide: true
-    property int hideDelay: 600  // ms after the pointer leaves
+    property int hideDelay: 700  // ms after the pointer leaves
 
     // Reserve screen space so windows don't go under the dock (ignored when autoHide is on).
     property bool reserveSpace: true

@@ -17,7 +17,7 @@ Scope {
     readonly property int openDelay: 350         // ms hover before opening
     readonly property int closeDelay: 350        // ms after leaving before closing
     readonly property int refreshMinutes: 15
-    readonly property string fontFamily: "Rubik" // falls back to default if missing
+    readonly property string fontFamily: "Poppins" // falls back to default if missing
 
     // ───────────── Palette (Material 3 dark) ─────────────
     readonly property color cSurface: Colors.md3.surface
@@ -204,7 +204,6 @@ Scope {
 
             // Only anchored right → compositor centers it vertically.
             anchors.right: true
-            // implicitWidth: weatherBar.panelWidth
             implicitWidth: weatherBar.panelWidth + weatherBar.overshootPad
             implicitHeight: content.implicitHeight + 48
             color: "transparent"
@@ -222,7 +221,6 @@ Scope {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                // width: weatherBar.open ? win.width : weatherBar.triggerWidth
                 width: weatherBar.open ? weatherBar.panelWidth : weatherBar.triggerWidth
             }
 
@@ -239,14 +237,11 @@ Scope {
                 width: weatherBar.panelWidth
                 height: parent.height
                 radius: 28
-                color: weatherBar.cSurface
-                // opacity: Math.min(1, weatherBar.reveal * 5)
+                color: Qt.alpha(weatherBar.cSurface, Colors.transparency)
                 opacity: Math.max(Math.min(1, weatherBar.reveal * 5), weatherBar.hovered ? 1 : 0)
                 transformOrigin: Item.Right
                 scale: 0.94 + 0.06 * weatherBar.spring(0)
 
-                // x: weatherBar.open ? 0 : weatherBar.panelWidth + 24
-                // x: weatherBar.open ? weatherBar.overshootPad : weatherBar.panelWidth + weatherBar.overshootPad + 24
                 x: weatherBar.open ? weatherBar.overshootPad
                     : weatherBar.hovered ? weatherBar.panelWidth + weatherBar.overshootPad - 16
                     : weatherBar.panelWidth + weatherBar.overshootPad + 24
@@ -354,7 +349,7 @@ Scope {
                     // ── 1: Hero ──
                     Rectangle {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 150
+                        Layout.preferredHeight: 180
                         visible: weatherBar.weather !== null
                         radius: 24
                         opacity: weatherBar.stage(1)
@@ -485,6 +480,7 @@ Scope {
                         RowLayout {
                             anchors.fill: parent
                             anchors.margins: 8
+                            anchors.leftMargin: 24
                             spacing: 0
 
                             Repeater {
@@ -535,7 +531,9 @@ Scope {
                             id: dailyCol
                             anchors.fill: parent
                             anchors.margins: 12
-                            spacing: 4
+                            anchors.leftMargin: 24
+                            anchors.rightMargin: 24
+                            spacing: 2
 
                             Repeater {
                                 model: weatherBar.weather ? weatherBar.weather.days : []

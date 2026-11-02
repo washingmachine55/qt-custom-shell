@@ -38,7 +38,7 @@ Variants {
 	        anchors.fill: topLeftCorn
 	        source: topLeftCorn
 	        color: Colors.md3.surface
-			opacity: 0.75 // Change this to any desired color
+			opacity: 0.85 // Change this to any desired color
 	    }
 
 		// top-right
@@ -57,7 +57,7 @@ Variants {
 	        anchors.fill: topRightCorn
 	        source: topRightCorn
 	        color: Colors.md3.surface
-			opacity: 0.75 // Change this to any desired color
+			opacity: 0.85 // Change this to any desired color
 			rotation: 90
 			transformOrigin: Item.Center
 	    }
@@ -80,7 +80,7 @@ Variants {
 	        anchors.fill: bottomRightCorn
 	        source: bottomRightCorn
 	        color: Colors.md3.surface
-			opacity: 0.75 // Change this to any desired color
+			opacity: 0.85 // Change this to any desired color
 			rotation: 180
 			transformOrigin: Item.Center
 	    }
@@ -101,7 +101,7 @@ Variants {
 	        anchors.fill: bottomLeftCorn
 	        source: bottomLeftCorn
 	        color: Colors.md3.surface
-			opacity: 0.75 // Change this to any desired color
+			opacity: 0.85 // Change this to any desired color
 			rotation: 270
 			transformOrigin: Item.Center
 	    }
