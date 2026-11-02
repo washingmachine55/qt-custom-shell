@@ -1,7 +1,9 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import qs
 
 Scope {
 	id: weatherBar
@@ -556,6 +558,7 @@ Scope {
 							] : []
 
 							delegate: Rectangle {
+								id: statItem
 								required property var modelData
 								Layout.fillWidth: true
 								Layout.preferredHeight: 62
@@ -568,19 +571,19 @@ Scope {
 									anchors.rightMargin: 10
 									spacing: 10
 									Text {
-										text: modelData.icon
+										text: statItem.modelData.icon
 										font.pixelSize: 22
 									}
 									ColumnLayout {
 										spacing: 0
 										Text {
-											text: modelData.label
+											text: statItem.modelData.label
 											color: weatherBar.cOnVariant
 											font.family: weatherBar.fontFamily
 											font.pixelSize: 11
 										}
 										Text {
-											text: modelData.value
+											text: statItem.modelData.value
 											color: weatherBar.cOnSurface
 											font.family: weatherBar.fontFamily
 											font.pixelSize: 15
@@ -613,6 +616,7 @@ Scope {
 							Repeater {
 								model: weatherBar.weather ? weatherBar.weather.hours : []
 								delegate: ColumnLayout {
+									id: hourItem
 									required property var modelData
 									Layout.fillWidth: true
 									Layout.fillHeight: true
@@ -622,19 +626,19 @@ Scope {
 									}
 									Text {
 										Layout.alignment: Qt.AlignHCenter
-										text: modelData.label
+										text: hourItem.modelData.label
 										color: weatherBar.cOnVariant
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 10
 									}
 									Text {
 										Layout.alignment: Qt.AlignHCenter
-										text: weatherBar.info(modelData.code, modelData.day).icon
+										text: weatherBar.info(hourItem.modelData.code, hourItem.modelData.day).icon
 										font.pixelSize: 22
 									}
 									Text {
 										Layout.alignment: Qt.AlignHCenter
-										text: modelData.temp + "°"
+										text: hourItem.modelData.temp + "°"
 										color: weatherBar.cOnSurface
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 13
@@ -671,6 +675,7 @@ Scope {
 							Repeater {
 								model: weatherBar.weather ? weatherBar.weather.days : []
 								delegate: RowLayout {
+									id: dayItem
 									required property var modelData
 									Layout.fillWidth: true
 									Layout.preferredHeight: 30
@@ -678,18 +683,18 @@ Scope {
 
 									Text {
 										Layout.preferredWidth: 46
-										text: modelData.name
+										text: dayItem.modelData.name
 										color: weatherBar.cOnSurface
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 13
 									}
 									Text {
-										text: weatherBar.info(modelData.code, true).icon
+										text: weatherBar.info(dayItem.modelData.code, true).icon
 										font.pixelSize: 18
 									}
 									Text {
 										Layout.preferredWidth: 32
-										text: modelData.rain + "%"
+										text: dayItem.modelData.rain + "%"
 										color: weatherBar.cRain
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 11
@@ -697,7 +702,7 @@ Scope {
 									}
 									Text {
 										Layout.preferredWidth: 26
-										text: modelData.min + "°"
+										text: dayItem.modelData.min + "°"
 										color: weatherBar.cOnVariant
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 12
@@ -719,14 +724,14 @@ Scope {
 											height: parent.height
 											radius: 3
 											color: weatherBar.cPrimary
-											x: (modelData.min - weatherBar.weather.gmin) / span * track.width
-											width: Math.max(6, (modelData.max - modelData.min) / span * track.width) * weatherBar.stage(4)
+											x: (dayItem.modelData.min - weatherBar.weather.gmin) / span * track.width
+											width: Math.max(6, (dayItem.modelData.max - dayItem.modelData.min) / span * track.width) * weatherBar.stage(4)
 										}
 									}
 
 									Text {
 										Layout.preferredWidth: 26
-										text: modelData.max + "°"
+										text: dayItem.modelData.max + "°"
 										color: weatherBar.cOnSurface
 										font.family: weatherBar.fontFamily
 										font.pixelSize: 12

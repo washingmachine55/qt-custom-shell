@@ -4,6 +4,12 @@ import Quickshell
 import "./dock"
 
 ShellRoot {
+	// Activate {
+	// 	id: w
+	// }
+	// StatusBar {
+	// 	id: statusBar
+	// }
 	RoundedOverlay {
 		id: roundedOverlay
 	}
@@ -13,12 +19,8 @@ ShellRoot {
 	VolumeOsd {
 		id: volumeOsd
 	}
-	// Activate	   { id: w }
 	Widgets {
 		id: widgets
-	}
-	StatusBar {
-		id: statusBar
 	}
 	WeatherBar {
 		id: weatherBar

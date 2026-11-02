@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs
+import qs.dock
 
 Variants {
 	model: Quickshell.screens.filter(s => DockSettings.screens.length === 0 || DockSettings.screens.includes(s.name))
@@ -20,6 +21,9 @@ Variants {
 		readonly property int headroom: Math.ceil(DockSettings.iconSize * (DockSettings.hoverScale - 1) + DockSettings.iconSize * 0.3)
 
 		property bool hidden: DockSettings.autoHide
+		// NiriWorkspaces is only started when the option is on (short-circuit).
+		readonly property bool emptyWorkspace: DockSettings.showOnEmptyWorkspace && NiriWorkspaces.isEmpty(modelData.name)
+		readonly property bool collapsed: hidden && !emptyWorkspace
 
 		readonly property var apps: {
 			DesktopEntries.applications.values;
@@ -79,7 +83,7 @@ Variants {
 		implicitHeight: vertical ? body.height + headroom * 2 : thickness + DockSettings.margin + headroom
 
 		mask: Region {
-			item: win.hidden ? sensor : body
+			item: win.collapsed ? sensor : body
 		}
 
 		function reveal() {
@@ -108,7 +112,7 @@ Variants {
 		Rectangle {
 			id: body
 
-			readonly property real hideOffset: win.hidden ? win.thickness + DockSettings.margin + 4 : 0
+			readonly property real hideOffset: win.collapsed ? win.thickness + DockSettings.margin + 4 : 0
 
 			width: win.vertical ? win.thickness : grid.implicitWidth + DockSettings.padding * 2
 			height: win.vertical ? grid.implicitHeight + DockSettings.padding * 2 : win.thickness

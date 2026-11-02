@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import qs
 
 // import QtQuick.Layouts
 
@@ -13,20 +14,21 @@ Variants {
 	model: Quickshell.screens
 	PanelWindow {
 		id: widgets
+
+		property var modelData
+		screen: modelData
+
 		focusable: true
 		visible: true
 		color: "transparent"
-		implicitHeight: screen.height
-		implicitWidth: screen.width
+		implicitHeight: modelData.height
+		implicitWidth: modelData.width
 		aboveWindows: false
 		Material.theme: Material.Dark
 		WlrLayershell.layer: WlrLayer.Bottom
 		mask: Region {
 			item: testReckt
 		}
-
-		property var modelData
-		screen: modelData
 
 		property bool isWidgetsActive: true
 		property string timerValue: ""

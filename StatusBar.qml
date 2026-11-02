@@ -1,9 +1,11 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
+import qs
 
 Variants {
 	model: Quickshell.screens
@@ -23,8 +25,8 @@ Variants {
 
 			visible: ShellState.isWidgetsActive
 			color: "transparent"
-			implicitHeight: screen.height / 6
-			implicitWidth: screen.width / 3
+			implicitHeight: modelData.height / 6
+			implicitWidth: modelData.width / 3
 			WlrLayershell.layer: WlrLayer.Bottom
 
 			property string cpuPercent: "0%"
@@ -315,6 +317,7 @@ Variants {
 						spacing: 6
 
 						BarModule {
+							hoverColor: statusBar.colHoverBg
 							id: clockModule
 							fontBold: true
 							textColor: statusBar.colAccent
@@ -338,6 +341,7 @@ Variants {
 						}
 
 						BarModule {
+							hoverColor: statusBar.colHoverBg
 							id: keyboardLayoutModule
 							property int layoutIdx: 0
 							property var layouts: ["US", "CDH"]
@@ -431,6 +435,7 @@ Variants {
 							spacing: 2
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: "󰂜"
 								textColor: statusBar.colTextMain
 								onClicked: mouse => {
@@ -442,6 +447,7 @@ Variants {
 							}
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: " " + statusBar.mediaStatus
 								textColor: statusBar.colAccent
 								implicitWidth: Math.min(textItem.implicitWidth + 18, 200)
@@ -449,18 +455,21 @@ Variants {
 							}
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: "󰂯"
 								textColor: statusBar.colAccent
 								onClicked: statusBar.exec(["kitty", "--app-id=bluetui", "bluetui"])
 							}
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: "󰤢"
 								textColor: statusBar.colTextMain
 								onClicked: statusBar.exec(["kitty", "--app-id=impala", "impala"])
 							}
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: ""
 								textColor: statusBar.colTextMain
 								onClicked: mouse => {
@@ -472,6 +481,7 @@ Variants {
 							}
 
 							BarModule {
+								hoverColor: statusBar.colHoverBg
 								text: ""
 								textColor: statusBar.colSuccess
 							}
@@ -493,12 +503,13 @@ Variants {
 		property alias textColor: moduleText.color
 		property alias fontBold: moduleText.font.bold
 		property alias textItem: moduleText
+		required property color hoverColor
 		signal clicked(var mouse)
 
 		implicitWidth: moduleText.implicitWidth + 18
 		implicitHeight: 24
 		radius: 12
-		color: moduleArea.containsMouse ? statusBar.colHoverBg : "transparent"
+		color: moduleArea.containsMouse ? hoverColor : "transparent"
 
 		Behavior on color {
 			ColorAnimation {
@@ -511,7 +522,6 @@ Variants {
 			anchors.centerIn: parent
 			font.family: "JetBrainsMonoNL Nerd Font, Inter, sans-serif"
 			font.pixelSize: 13
-			color: statusBar.colTextMain
 		}
 
 		MouseArea {

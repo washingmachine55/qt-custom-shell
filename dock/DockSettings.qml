@@ -30,6 +30,9 @@ Singleton {
 	property bool autoHide: true
 	property int hideDelay: 700  // ms after the pointer leaves
 
+	// With autoHide on, keep the dock shown while the current workspace on that screen has no windows.
+	property bool showOnEmptyWorkspace: true
+
 	// Reserve screen space so windows don't go under the dock (ignored when autoHide is on).
 	property bool reserveSpace: true
 }

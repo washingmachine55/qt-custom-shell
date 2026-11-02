@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls.Material
 import Quickshell
 import Quickshell.Wayland
+import qs
 
 Variants {
 	// Create the panel once on each monitor.
@@ -12,16 +13,16 @@ Variants {
 		id: roundedOverlay
 
 		property var modelData
+		screen: modelData
 
 		focusable: false
 		visible: true
 		color: "transparent"
-		implicitHeight: screen.height
-		implicitWidth: screen.width
+		implicitHeight: modelData.height
+		implicitWidth: modelData.width
 		aboveWindows: true
 		Material.theme: Material.Dark
 		WlrLayershell.layer: WlrLayer.Top
-		screen: modelData
 
 		mask: Region {}
 

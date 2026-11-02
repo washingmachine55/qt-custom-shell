@@ -1,7 +1,9 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Widgets
 import qs
+import qs.dock
 
 Item {
 	id: root

@@ -3,6 +3,7 @@ import QtQuick.Controls.Material
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import qs
 
 ShellRoot {
 	Variants {
@@ -11,18 +12,19 @@ ShellRoot {
 
 		PanelWindow {
 			id: dateAndTime
+
+			property var modelData
+			screen: modelData
+
 			focusable: false
 			visible: true
 			color: "transparent"
-			implicitHeight: screen.height
-			implicitWidth: screen.width
+			implicitHeight: modelData.height
+			implicitWidth: modelData.width
 			aboveWindows: false
 			Material.theme: Material.Dark
 			WlrLayershell.layer: WlrLayer.Bottom
 			mask: Region {}
-
-			property var modelData
-			screen: modelData
 
 			ColumnLayout {
 				id: content
