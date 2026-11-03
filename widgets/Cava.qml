@@ -7,6 +7,18 @@ import qs
 Item {
 	id: root
 
+	// ── Screens ──
+	// Screen names to show it on (see `niri msg outputs`). Empty = all screens.
+	// cava doesn't run at all on excluded screens.
+	property var screens: []
+	required property string screenName
+	// Stop cava while the focused window on this screen covers more than coverThreshold of it.
+	property bool pauseWhenCovered: true
+	property real coverThreshold: 0.8
+	// NiriWorkspaces only starts when the option is on (short-circuit).
+	readonly property bool covered: pauseWhenCovered && NiriWorkspaces.coverage(screenName, parent.width, parent.height) > coverThreshold
+	readonly property bool active: visible && !covered && (screens.length === 0 || screens.includes(screenName))
+
 	// ── Position ──
 	// "top-left", "top", "top-right", "left", "center", "right", "bottom-left", "bottom", "bottom-right"
 	property string anchor: "bottom"
@@ -92,7 +104,7 @@ Item {
 	}
 
 	Process {
-		running: root.ready && root.visible
+		running: root.ready && root.active
 		// Raw ascii mode prints one "12;34;...;" line per frame, each value 0–100.
 		command: ["sh", "-c", `conf="\${XDG_RUNTIME_DIR:-/tmp}/qs-cava-${root.bars}-${root.framerate}-${root.stereo}-${root.noiseReduction}.conf"
 printf '[general]\\nbars = ${root.bars}\\nframerate = ${root.framerate}\\n[output]\\nmethod = raw\\nraw_target = /dev/stdout\\ndata_format = ascii\\nascii_max_range = 100\\nbar_delimiter = 59\\nchannels = ${root.stereo ? "stereo" : "mono"}\\n[smoothing]\\nnoise_reduction = ${root.noiseReduction}\\n' > "$conf"
@@ -103,6 +115,7 @@ exec cava -p "$conf"`]
 	}
 
 	Row {
+		visible: root.active
 		anchors.fill: parent
 		spacing: root.barSpacing
 		opacity: root.barOpacity

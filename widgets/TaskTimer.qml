@@ -41,7 +41,7 @@ Rectangle {
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.left: parent.left
 		anchors.leftMargin: 14
-		spacing: 14
+		spacing: 12
 
 		Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
@@ -65,6 +65,7 @@ Rectangle {
 
 			Text {
 				text: root.label.toUpperCase()
+				// anchors.horizontalCenter: parent.right
 				color: Colors.md3.on_surface_variant
 				font.family: root.fontFamily
 				font.pixelSize: 11
@@ -76,6 +77,7 @@ Rectangle {
 				// Dim the h/m/s units so the digits stand out.
 				text: root.value.replace(/(\d+)([a-z]+)/g, `$1<font color="${Colors.md3.on_surface_variant}">$2</font>`)
 				textFormat: Text.StyledText
+				// anchors.horizontalCenter: parent.right
 				color: Colors.md3.on_surface
 				font.family: root.fontFamily
 				font.pixelSize: 24
