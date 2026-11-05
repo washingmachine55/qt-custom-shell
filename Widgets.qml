@@ -46,30 +46,30 @@ Variants {
 			z: -1 // behind the other widgets; raise it to bring it forward
 
 			// Position: anchor to a screen edge/corner, offsets are gaps from it.
-			anchor: "top" // top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right
+			anchor: "center" // top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right
 			// offsetX: 250
 			// offsetY: 250
-			fillWidth: true // stretch across the screen
+			fillWidth: false // stretch across the screen
 
-			bars: 44
-			barWidth: 12
-			barSpacing: 42
-			barHeight: 820
-			direction: "down" // up, down, center
-			roundBars: false
+			bars: 60
+			barWidth: 4
+			barSpacing: 28
+			barHeight: 1080
+			direction: "center" // up, down, center
+			roundBars: true
 
 			// Colors: single, gradient, vertical, level or palette (any Colors.md3.* works).
 			colorMode: "vertical"
 			// color: Colors.md3.on_secondary_container
 			gradientStart: Colors.md3.primary
-			gradientEnd: Qt.alpha(Colors.md3.primary, 0.2)
+			gradientEnd: Qt.alpha(Colors.md3.tertiary, 0)
 			// paletteColors: [Colors.md3.primary, Colors.md3.scrim, Colors.md3.tertiary]
-			barOpacity: 0.85
+			barOpacity: 1
 
 			framerate: 60 // lower (e.g. 30) to use less CPU
 			pauseWhenCovered: true // stop while the focused window covers most of this screen
 			coverThreshold: 0.8 // 0–1, fraction of the screen
-			// smoothing: 60 // ms
+			smoothing: 60 // ms
 			// hideWhenSilent: true
 			stereo: true
 		}
