@@ -20,8 +20,8 @@ Item {
     property var animEasing: Easing.InOutCubic // Gives a nice subtle modern spring/pop
 
     // Initial positioning of the widget container (draggable)
-    x: root.implicitWidth/2
-    y: root.implicitHeight/2
+    x: 780
+    y: 100
 
     width: expandedWidth
     height: expandedHeight
@@ -60,8 +60,8 @@ Item {
         id: iconWrapper
         width: container.collapsedSize
         height: container.collapsedSize
-        anchors.centerIn: parent
-        transformOrigin: Item.Center
+        anchors.horizontalCenter: parent.horizontalCenter
+        transformOrigin: Item.Top
         z: container.expanded ? 0 : 2
 
         Rectangle {
