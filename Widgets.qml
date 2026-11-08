@@ -24,17 +24,23 @@ Variants {
 
 		// Only the lock takes clicks; everything else passes through to the desktop.
 		mask: Region {
-			item: lock
+			item: inputContainer
 		}
 
-		LockToggle {
-			id: lock
-			x: win.width - width - 80
-			y: 80
-		}
+		Item {
+			id: inputContainer
+			anchors.fill: parent
 
-		Calandar {
-			visible: ShellState.isWidgetsActive
+			LockToggle {
+				id: lock
+				x: win.width - width - 80
+				y: 80
+			}
+
+			Calandar {
+				id: calandarModule
+				visible: ShellState.isWidgetsActive
+			}
 		}
 
 		TaskTimer {
