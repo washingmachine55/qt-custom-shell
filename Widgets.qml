@@ -33,8 +33,8 @@ Variants {
 
 			LockToggle {
 				id: lock
-				x: win.width - width - 80
-				y: 80
+				x: win.width - width - 10
+				y: 10
 			}
 
 			Calandar {
