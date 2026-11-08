@@ -13,6 +13,7 @@ Rectangle {
 	property string output: ""
 	readonly property string label: output.includes(":") ? output.split(":")[0].trim() : "Task timer"
 	readonly property string value: output.includes(":") ? output.slice(output.indexOf(":") + 1).trim() : output
+	readonly property string scriptUrl: Qt.resolvedUrl("../scripts/taskTimer.sh")
 
 	width: 250
 	height: 75
@@ -23,7 +24,7 @@ Rectangle {
 
 	Process {
 		id: proc
-		command: ["/home/devmed/qt-custom-shell/scripts/taskTimer.sh"]
+		command: root.scriptUrl
 		stdout: SplitParser {
 			onRead: data => root.output = data.trim()
 		}

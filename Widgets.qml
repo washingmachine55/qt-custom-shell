@@ -20,7 +20,7 @@ Variants {
 		color: "transparent"
 		focusable: true
 		aboveWindows: false
-		WlrLayershell.layer: WlrLayer.Bottom
+		WlrLayershell.layer: WlrLayer.Background
 
 		// Only the lock takes clicks; everything else passes through to the desktop.
 		mask: Region {
@@ -33,6 +33,10 @@ Variants {
 			y: 80
 		}
 
+		Calandar {
+			visible: ShellState.isWidgetsActive
+		}
+
 		TaskTimer {
 			visible: ShellState.isWidgetsActive
 			x: (win.width - width) / 2
@@ -42,7 +46,8 @@ Variants {
 		Cava {
 			visible: ShellState.isWidgetsActive
 			screenName: win.modelData.name
-			screens: ["eDP-1"] // e.g. ["HDMI-A-1"]; empty = all screens
+			// screens: ["eDP-1"] // e.g. ["HDMI-A-1"]; empty = all screens
+			screens: [] // e.g. ["HDMI-A-1"]; empty = all screens
 			z: -1 // behind the other widgets; raise it to bring it forward
 
 			// Position: anchor to a screen edge/corner, offsets are gaps from it.
