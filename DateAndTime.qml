@@ -37,8 +37,8 @@ ShellRoot {
 				// --- PHYSICS & CONFIGURATION PROPERTIES ---
 				property real vx: 0.0          // Current X velocity
 				property real vy: 0.0          // Current Y velocity
-				property real friction: 0.98   // Resistance factor (0.90 = high resistance, 0.99 = low friction glide)
-				property real bounce: 0.1      // Energy retention on wall bounce (0.0 = stops dead, 1.0 = perfect bounce)
+				property real friction: 0.985   // Resistance factor (0.90 = high resistance, 0.99 = low friction glide)
+				property real bounce: 0.33333      // Energy retention on wall bounce (0.0 = stops dead, 1.0 = perfect bounce)
 
 				// Keep track of the last known position to calculate velocity chunks
 				property int lastMouseX: 0

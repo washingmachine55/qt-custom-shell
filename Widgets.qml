@@ -60,20 +60,20 @@ Variants {
 			anchor: "center" // top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right
 			// offsetX: 250
 			// offsetY: 250
-			fillWidth: false // stretch across the screen
+			fillWidth: true // stretch across the screen
 
-			bars: 60
-			barWidth: 4
-			barSpacing: 28
+			bars: 46
+			barWidth: 14
+			barSpacing: 24
 			barHeight: 1080
-			direction: "center" // up, down, center
+			direction: "down" // up, down, center
 			roundBars: true
 
 			// Colors: single, gradient, vertical, level or palette (any Colors.md3.* works).
 			colorMode: "vertical"
 			// color: Colors.md3.on_secondary_container
 			gradientStart: Colors.md3.primary
-			gradientEnd: Qt.alpha(Colors.md3.tertiary, 0)
+			gradientEnd: Qt.alpha(Colors.md3.scrim, 0)
 			// paletteColors: [Colors.md3.primary, Colors.md3.scrim, Colors.md3.tertiary]
 			barOpacity: 1
 
