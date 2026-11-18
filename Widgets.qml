@@ -46,7 +46,7 @@ Variants {
 		TaskTimer {
 			visible: ShellState.isWidgetsActive
 			x: (win.width - width) / 2
-			y: 9
+			y: 8
 		}
 
 		Cava {
