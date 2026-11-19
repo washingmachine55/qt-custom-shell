@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import qs
 import qs.widgets
@@ -52,13 +53,12 @@ Variants {
 			NorthStar {
 				id: northStar
 				opacity: ShellState.isWidgetsActive ? 1 : 0
-
+				fontSize: 394
 				width: parent.width
-				widgetWidth: win.modelData.width / 1.25
+				widgetWidth: win.modelData.width / 2
+				y: (win.modelData.height - height) + 100
 
-				textToShow: "survive"
-				fontSize: 444
-				y: (win.modelData.height / 2.5)
+				textToShow: quoteCollector.text.trim()
 
 				Behavior on opacity {
 					NumberAnimation {
@@ -66,6 +66,15 @@ Variants {
 						easing.type: Easing.OutCubic
 					}
 				}
+			}
+		}
+
+		Process {
+			id: quoteProcess
+			command: [Qt.resolvedUrl("./scripts/northStarText.sh")]
+			running: ShellState.isWidgetsActive
+			stdout: StdioCollector {
+				id: quoteCollector
 			}
 		}
 

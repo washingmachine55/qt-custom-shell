@@ -5,9 +5,14 @@ Item {
 	property string textToShow: ""
 	property int widgetWidth: 800
 	property int fontSize: 22
-	property string fontFamily: "Poppins"
+	property string fontFamily: "zalando sans expanded"
 	property int fontWeight: 500
-	property real fontLetterSpacing: -12.5
+	property real fontLetterSpacing: -19.5
+	property int maxDuration: 10000
+	property int minDuration: 150
+
+	width: textColumn.width
+	height: textColumn.height
 
 	// Automatically match the container height to the rendered text
 	implicitWidth: widgetWidth
@@ -100,6 +105,12 @@ Item {
 								property bool isHovered: hoverHandler.hovered
 								property real transparency: letterContainer.isHovered ? 0.95 : 0
 
+								TextMetrics {
+									id: glyphMetrics
+									font: letterText.font
+									text: modelData
+								}
+
 								Text {
 									id: letterText
 									text: modelData
@@ -110,33 +121,45 @@ Item {
 									font.letterSpacing: root.fontLetterSpacing
 									// renderType: Text.NativeRendering
 
-									y: letterContainer.isHovered ? -2 : 0
-									scale: letterContainer.isHovered ? 1.05 : 1.0
+									scale: letterContainer.isHovered ? 1.005 : 1.0
+									transform: Translate {
+										y: letterContainer.isHovered ? -40 : 0
 
-									Behavior on y {
-										NumberAnimation {
-											duration: letterContainer.isHovered ? 50 : 12000
-											easing.type: letterContainer.isHovered ? Easing.OutBack : Easing.OutCubic
+										Behavior on y {
+											NumberAnimation {
+												duration: letterContainer.isHovered ? root.minDuration : root.maxDuration
+												easing.type: letterContainer.isHovered ? Easing.OutBack : Easing.OutCubic
+											}
 										}
 									}
 
 									Behavior on scale {
 										NumberAnimation {
-											duration: letterContainer.isHovered ? 50 : 12000
+											duration: letterContainer.isHovered ? root.minDuration : root.maxDuration
 											easing.type: letterContainer.isHovered ? Easing.OutBack : Easing.OutCubic
 										}
 									}
 
 									Behavior on color {
 										ColorAnimation {
-											duration: letterContainer.isHovered ? 12000 : 50
+											duration: letterContainer.isHovered ? root.maxDuration : root.minDuration
 										}
 									}
 								}
 
-								HoverHandler {
-									id: hoverHandler
-									margin: 1
+								// Tight hitbox matching only the visible glyph ink
+								Item {
+									id: tightHitbox
+									x: glyphMetrics.tightBoundingRect.x
+									// Align tight rect vertically with the centered Text element
+									y: (letterContainer.height - letterText.height) / 2 + letterText.baselineOffset + glyphMetrics.tightBoundingRect.y
+									width: Math.max(1, glyphMetrics.tightBoundingRect.width)
+									height: Math.max(1, glyphMetrics.tightBoundingRect.height)
+
+									HoverHandler {
+										id: hoverHandler
+										margin: 0 // No extra padding outside the glyph ink
+									}
 								}
 							}
 						}
