@@ -52,11 +52,13 @@ Variants {
 			NorthStar {
 				id: northStar
 				opacity: ShellState.isWidgetsActive ? 1 : 0
+
+				width: parent.width
+				widgetWidth: win.modelData.width / 1.25
+
 				textToShow: "survive"
-				fontSize: 244
-				transparency: 0.2
-				x: (win.modelData.width / 2)
-				y: (win.modelData.height / 2.25)
+				fontSize: 444
+				y: (win.modelData.height / 2.5)
 
 				Behavior on opacity {
 					NumberAnimation {
