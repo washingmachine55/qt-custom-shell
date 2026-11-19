@@ -4,9 +4,9 @@ import Quickshell
 import "./dock"
 
 ShellRoot {
-	// Activate {
-	// 	id: w
-	// }
+	Activate {
+		id: w
+	}
 	// StatusBar {
 	// 	id: statusBar
 	// }

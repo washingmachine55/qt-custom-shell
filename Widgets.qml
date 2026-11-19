@@ -39,14 +39,45 @@ Variants {
 
 			Calandar {
 				id: calandarModule
-				visible: ShellState.isWidgetsActive
+				opacity: ShellState.isWidgetsActive ? 1 : 0
+
+				Behavior on opacity {
+					NumberAnimation {
+						duration: 1000
+						easing.type: Easing.OutCubic
+					}
+				}
+			}
+
+			NorthStar {
+				id: northStar
+				opacity: ShellState.isWidgetsActive ? 1 : 0
+				textToShow: "survive"
+				fontSize: 244
+				transparency: 0.2
+				x: (win.modelData.width / 2)
+				y: (win.modelData.height / 2.25)
+
+				Behavior on opacity {
+					NumberAnimation {
+						duration: 1000
+						easing.type: Easing.OutCubic
+					}
+				}
 			}
 		}
 
 		TaskTimer {
-			visible: ShellState.isWidgetsActive
+			opacity: ShellState.isWidgetsActive ? 1 : 0
 			x: (win.width - width) / 2
 			y: 8
+
+			Behavior on opacity {
+				NumberAnimation {
+					duration: 1000
+					easing.type: Easing.OutCubic
+				}
+			}
 		}
 
 		Cava {
