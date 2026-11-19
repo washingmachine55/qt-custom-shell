@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import qs
 
 // Edit this file to configure the dock. Changes hot-reload.
 Singleton {
@@ -31,7 +32,7 @@ Singleton {
 	property int hideDelay: 700  // ms after the pointer leaves
 
 	// With autoHide on, keep the dock shown while the current workspace on that screen has no windows.
-	property bool showOnEmptyWorkspace: true
+	property bool showOnEmptyWorkspace: ShellState.isWidgetsActive
 
 	// Reserve screen space so windows don't go under the dock (ignored when autoHide is on).
 	property bool reserveSpace: true
