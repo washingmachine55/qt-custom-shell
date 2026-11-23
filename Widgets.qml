@@ -52,11 +52,11 @@ Variants {
 
 			NorthStar {
 				id: northStar
-				opacity: ShellState.isWidgetsActive ? 1 : 0
-				fontSize: 394
+				opacity: ShellState.isWidgetsActive ? 1 : 0.2
+				fontSize: 128
 				width: parent.width
-				widgetWidth: win.modelData.width / 2
-				y: (win.modelData.height - height) + 100
+				widgetWidth: win.modelData.width
+				y: (win.modelData.height - height) - 100
 
 				textToShow: quoteCollector.text.trim()
 
@@ -102,28 +102,28 @@ Variants {
 			anchor: "center" // top-left, top, top-right, left, center, right, bottom-left, bottom, bottom-right
 			// offsetX: 250
 			// offsetY: 250
-			fillWidth: true // stretch across the screen
+			fillWidth: false // stretch across the screen
 
-			bars: 46
-			barWidth: 14
-			barSpacing: 24
-			barHeight: 1080
-			direction: "down" // up, down, center
+			bars: 32
+			barWidth: 2
+			barSpacing: 18
+			barHeight: 320
+			direction: "center" // up, down, center
 			roundBars: true
 
 			// Colors: single, gradient, vertical, level or palette (any Colors.md3.* works).
-			colorMode: "vertical"
-			// color: Colors.md3.on_secondary_container
+			colorMode: "single"
+			color: Colors.md3.primary
 			gradientStart: Colors.md3.primary
 			gradientEnd: Qt.alpha(Colors.md3.scrim, 0)
-			// paletteColors: [Colors.md3.primary, Colors.md3.scrim, Colors.md3.tertiary]
-			barOpacity: 1
+			paletteColors: [Colors.md3.primary, Colors.md3.secondary, Colors.md3.tertiary]
+			barOpacity: 0.75
 
 			framerate: 60 // lower (e.g. 30) to use less CPU
 			pauseWhenCovered: true // stop while the focused window covers most of this screen
 			coverThreshold: 0.8 // 0–1, fraction of the screen
 			smoothing: 60 // ms
-			// hideWhenSilent: true
+			hideWhenSilent: true
 			stereo: true
 		}
 	}

@@ -1,4 +1,5 @@
 import QtQuick
+import qs
 
 Item {
 	id: root
@@ -10,6 +11,8 @@ Item {
 	property real fontLetterSpacing: -19.5
 	property int maxDuration: 10000
 	property int minDuration: 150
+	property int wordSpacing: 82 // gap between words, used both to wrap lines and to draw them
+	property real textBaseOpacity: 0.15
 
 	width: textColumn.width
 	height: textColumn.height
@@ -18,15 +21,14 @@ Item {
 	implicitWidth: widgetWidth
 	implicitHeight: textColumn.height
 
-	// Invisible Text element used solely to measure exact word widths in Poppins
-	Text {
-		id: textMetrics
-		visible: false
+	// Measures word widths for line wrapping. Unlike a hidden Text, measuring here doesn't
+	// change any property, so the Repeater model binding below can't loop on itself.
+	FontMetrics {
+		id: wordMetrics
 		font.pointSize: root.fontSize
 		font.family: root.fontFamily
 		font.weight: root.fontWeight
-		font.letterSpacing: root.fontLetterSpacing // Adjusted: -18.0 overlaps letters completely on single characters
-		renderType: Text.NativeRendering
+		font.letterSpacing: root.fontLetterSpacing // -18.0 overlaps letters completely on single characters
 	}
 
 	// Helper function to group words into lines that fit inside root.widgetWidth
@@ -36,7 +38,7 @@ Item {
 
 		var paragraphs = fullText.split("\n");
 		var allLines = [];
-		var wordGap = 12; // Space between words
+		var wordGap = root.wordSpacing;
 
 		for (var p = 0; p < paragraphs.length; p++) {
 			var words = paragraphs[p].split(" ");
@@ -47,8 +49,7 @@ Item {
 				var word = words[i];
 				if (word.length === 0)
 					continue;
-				textMetrics.text = word;
-				var wordWidth = textMetrics.advance.width;
+				var wordWidth = wordMetrics.advanceWidth(word);
 
 				if (currentLine.length === 0) {
 					currentLine.push(word);
@@ -72,7 +73,7 @@ Item {
 	Column {
 		id: textColumn
 		anchors.centerIn: parent
-		spacing: -44
+		spacing: -24
 
 		// 1. Line Repeater: Creates each centered line
 		Repeater {
@@ -81,7 +82,7 @@ Item {
 			delegate: Row {
 				id: lineRow
 				anchors.horizontalCenter: parent.horizontalCenter // Centers every line!
-				spacing: 32 // Horizontal space between words
+				spacing: root.wordSpacing
 				property var wordsInLine: modelData
 
 				// 2. Word Repeater: Keeps letters of a word together
@@ -90,7 +91,7 @@ Item {
 
 					delegate: Row {
 						id: wordRow
-						spacing: 0 // Letter spacing is controlled below
+						spacing: 18 // Letter spacing is controlled below
 						property string currentWord: modelData
 
 						// 3. Letter Repeater: Individual hoverable characters
@@ -103,7 +104,7 @@ Item {
 								height: letterText.height
 
 								property bool isHovered: hoverHandler.hovered
-								property real transparency: letterContainer.isHovered ? 0.95 : 0
+								property real transparency: letterContainer.isHovered ? 0.95 : root.textBaseOpacity
 
 								TextMetrics {
 									id: glyphMetrics

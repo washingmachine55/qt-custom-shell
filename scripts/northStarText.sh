@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "survive"
+echo "against all odds"

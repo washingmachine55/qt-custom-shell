@@ -86,21 +86,23 @@ Item {
 	x: fillWidth ? offsetX : anchor.includes("left") ? offsetX : anchor.includes("right") ? parent.width - width - offsetX : (parent.width - width) / 2 + offsetX
 	y: anchor.startsWith("top") ? offsetY : anchor.startsWith("bottom") ? parent.height - height - offsetY : (parent.height - height) / 2 + offsetY
 
-	opacity: hideWhenSilent && silenceTimer.elapsed ? 0 : 1
+	// Set once it has been silent for silenceDelay; cleared as soon as sound comes back.
+	property bool hiddenForSilence: false
+	onSilentChanged: if (!silent)
+		hiddenForSilence = false
+
+	opacity: hideWhenSilent && hiddenForSilence ? 0 : 1
 	Behavior on opacity {
 		NumberAnimation {
 			duration: 400
 		}
 	}
 
+	// Counts down while silent; any sound before it fires stops it, so the countdown starts over.
 	Timer {
-		id: silenceTimer
-		property bool elapsed: false
 		interval: root.silenceDelay
-		running: root.hideWhenSilent && root.silent
-		onTriggered: elapsed = true
-		onRunningChanged: if (!running)
-			elapsed = false
+		running: root.hideWhenSilent && root.silent && !root.hiddenForSilence
+		onTriggered: root.hiddenForSilence = true
 	}
 
 	Process {
