@@ -52,13 +52,18 @@ Variants {
 
 			NorthStar {
 				id: northStar
-				opacity: ShellState.isWidgetsActive ? 1 : 0.2
+				opacity: ShellState.isWidgetsActive ? 1 : 0
 				fontSize: 128
 				width: parent.width
-				widgetWidth: win.modelData.width
-				y: (win.modelData.height - height) - 100
+				widgetWidth: win.modelData.width / 1.6
+				y: (win.modelData.height - height) - 80
 
 				textToShow: quoteCollector.text.trim()
+				textBaseOpacity: 0.15
+				lineSpacing: -58
+				wordSpacing: 76
+				fadeOutDuration: 350
+				fadeInDuration: 50
 
 				Behavior on opacity {
 					NumberAnimation {

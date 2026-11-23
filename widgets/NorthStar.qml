@@ -12,7 +12,11 @@ Item {
 	property int maxDuration: 10000
 	property int minDuration: 150
 	property int wordSpacing: 82 // gap between words, used both to wrap lines and to draw them
-	property real textBaseOpacity: 0.15
+	property real textBaseOpacity: 0.15 // letters when not hovered
+	property real hoverOpacity: 0.95 // letters while hovered
+	property int fadeInDuration: minDuration // ms to reach hoverOpacity
+	property int fadeOutDuration: maxDuration // ms to return to textBaseOpacity
+	property int lineSpacing: -24
 
 	width: textColumn.width
 	height: textColumn.height
@@ -73,7 +77,7 @@ Item {
 	Column {
 		id: textColumn
 		anchors.centerIn: parent
-		spacing: -24
+		spacing: root.lineSpacing
 
 		// 1. Line Repeater: Creates each centered line
 		Repeater {
@@ -91,7 +95,7 @@ Item {
 
 					delegate: Row {
 						id: wordRow
-						spacing: 18 // Letter spacing is controlled below
+						spacing: 6 // Letter spacing is controlled below
 						property string currentWord: modelData
 
 						// 3. Letter Repeater: Individual hoverable characters
@@ -104,7 +108,7 @@ Item {
 								height: letterText.height
 
 								property bool isHovered: hoverHandler.hovered
-								property real transparency: letterContainer.isHovered ? 0.95 : root.textBaseOpacity
+								property real transparency: letterContainer.isHovered ? root.hoverOpacity : root.textBaseOpacity
 
 								TextMetrics {
 									id: glyphMetrics
@@ -124,7 +128,7 @@ Item {
 
 									scale: letterContainer.isHovered ? 1.005 : 1.0
 									transform: Translate {
-										y: letterContainer.isHovered ? -40 : 0
+										y: letterContainer.isHovered ? -4 : 0
 
 										Behavior on y {
 											NumberAnimation {
@@ -142,8 +146,12 @@ Item {
 									}
 
 									Behavior on color {
+										id: colorBehavior
 										ColorAnimation {
-											duration: letterContainer.isHovered ? root.maxDuration : root.minDuration
+											// Fading in or out is decided from where the color is heading (targetValue),
+											// since reading isHovered here can see the previous hover state. Compared
+											// against the midpoint because stored alpha is rounded (0.5 reads as ~0.50001).
+											duration: colorBehavior.targetValue.a > (root.textBaseOpacity + root.hoverOpacity) / 2 ? root.fadeInDuration : root.fadeOutDuration
 										}
 									}
 								}
