@@ -39,7 +39,7 @@ Rectangle {
 
 	Timer {
 		interval: root.refreshInterval
-		running: true
+		running: root.opacity > 0
 		repeat: true
 		triggeredOnStart: true
 		onTriggered: proc.running = true

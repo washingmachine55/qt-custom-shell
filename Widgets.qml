@@ -50,6 +50,19 @@ Variants {
 				}
 			}
 
+			DateAndTime {
+				id: dateAndTime
+				implicitWidthCustom: win.modelData.width
+				implicitHeightCustom: win.modelData.height
+				opacity: ShellState.isWidgetsActive ? 1 : 0
+				Behavior on opacity {
+					NumberAnimation {
+						duration: 1000
+						easing.type: Easing.OutCubic
+					}
+				}
+			}
+
 			NorthStar {
 				id: northStar
 				opacity: ShellState.isWidgetsActive ? 0 : 1
@@ -60,7 +73,7 @@ Variants {
 
 				textToShow: quoteCollector.text.trim()
 				textBaseOpacity: 0.45
-				fontFamily: "Poppins"
+				fontFamily: "JetBrainsMono"
 				fontColor: Colors.md3.on_primary_container
 				fontLetterSpacing: -50
 				lineSpacing: -198

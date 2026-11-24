@@ -60,7 +60,7 @@ Variants {
 
 			Process {
 				id: netMonProcess
-				command: ["/home/devmed/qt-custom-shell/scripts/networkSpeed.sh"]
+				command: [Qt.resolvedUrl("./scripts/networkSpeed.sh")]
 				stdout: SplitParser {
 					splitMarker: "\n"
 					onRead: data => {
@@ -120,7 +120,7 @@ Variants {
 
 			Timer {
 				interval: 2000
-				running: true
+				running: ShellState.isWidgetsActive
 				repeat: true
 				triggeredOnStart: true
 				onTriggered: {
@@ -317,8 +317,8 @@ Variants {
 						spacing: 6
 
 						BarModule {
-							hoverColor: statusBar.colHoverBg
 							id: clockModule
+							hoverColor: statusBar.colHoverBg
 							fontBold: true
 							textColor: statusBar.colAccent
 
@@ -341,8 +341,8 @@ Variants {
 						}
 
 						BarModule {
-							hoverColor: statusBar.colHoverBg
 							id: keyboardLayoutModule
+							hoverColor: statusBar.colHoverBg
 							property int layoutIdx: 0
 							property var layouts: ["US", "CDH"]
 							// text: "[ " + layouts[layoutIdx] + " ]"

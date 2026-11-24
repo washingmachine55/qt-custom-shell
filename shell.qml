@@ -13,9 +13,9 @@ ShellRoot {
 	RoundedOverlay {
 		id: roundedOverlay
 	}
-	DateAndTime {
-		id: dateAndTime
-	}
+	// DateAndTime {
+	// 	id: dateAndTime
+	// }
 	VolumeOsd {
 		id: volumeOsd
 	}
