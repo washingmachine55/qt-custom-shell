@@ -15,4 +15,12 @@ Singleton {
 			onRead: data => stateRoot.isDarkScheme = data.includes("prefer-dark")
 		}
 	}
+
+	IpcHandler {
+		target: "stateRoot"
+
+		function toggleState(): void {
+			stateRoot.isWidgetsActive = !stateRoot.isWidgetsActive;
+		}
+	}
 }

@@ -52,15 +52,18 @@ Variants {
 
 			NorthStar {
 				id: northStar
-				opacity: ShellState.isWidgetsActive ? 1 : 0
-				fontSize: 128
+				opacity: ShellState.isWidgetsActive ? 0 : 1
+				fontSize: 288
 				width: parent.width
-				widgetWidth: win.modelData.width / 1.6
-				y: (win.modelData.height - height) - 80
+				widgetWidth: win.modelData.width / 1.1
+				y: (win.modelData.height - height) - 120
 
 				textToShow: quoteCollector.text.trim()
-				textBaseOpacity: 0.15
-				lineSpacing: -58
+				textBaseOpacity: 0.45
+				fontFamily: "Poppins"
+				fontColor: Colors.md3.on_primary_container
+				fontLetterSpacing: -50
+				lineSpacing: -198
 				wordSpacing: 76
 				fadeOutDuration: 350
 				fadeInDuration: 50
@@ -118,7 +121,7 @@ Variants {
 
 			// Colors: single, gradient, vertical, level or palette (any Colors.md3.* works).
 			colorMode: "single"
-			color: Colors.md3.primary
+			color: Colors.md3.on_primary_container
 			gradientStart: Colors.md3.primary
 			gradientEnd: Qt.alpha(Colors.md3.scrim, 0)
 			paletteColors: [Colors.md3.primary, Colors.md3.secondary, Colors.md3.tertiary]

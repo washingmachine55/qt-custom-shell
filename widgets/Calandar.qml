@@ -141,7 +141,7 @@ Item {
 				Text {
 					anchors.centerIn: parent
 					text: ""
-					color: ShellState.isDarkScheme ? Colors.md3.primary : Colors.md3.inverse_primary
+					color: Colors.md3.on_primary_container
 					font.pixelSize: 20
 				}
 			}

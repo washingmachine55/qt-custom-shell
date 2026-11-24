@@ -9,6 +9,8 @@ Item {
 	property string fontFamily: "zalando sans expanded"
 	property int fontWeight: 500
 	property real fontLetterSpacing: -19.5
+	property string fontColor: Colors.md3.inverse_primary
+
 	property int maxDuration: 10000
 	property int minDuration: 150
 	property int wordSpacing: 82 // gap between words, used both to wrap lines and to draw them
@@ -120,7 +122,7 @@ Item {
 									id: letterText
 									text: modelData
 									font.pointSize: root.fontSize
-									color: Qt.alpha(Colors.md3.primary, letterContainer.transparency)
+									color: Qt.alpha(root.fontColor, letterContainer.transparency)
 									font.family: root.fontFamily
 									font.weight: root.fontWeight
 									font.letterSpacing: root.fontLetterSpacing
